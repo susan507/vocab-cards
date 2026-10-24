@@ -19,7 +19,24 @@ function save(key: string, value: string) {
   AsyncStorage.setItem(key, value).catch(() => {});
 }
 
-function usePersisted(key: string) {
+export async function loadPersisted(key: string) {
+  if (!cache.has(key)) {
+    const saved = await AsyncStorage.getItem(key).catch(() => null);
+    if (!cache.has(key)) {
+      cache.set(key, saved);
+      listeners.forEach(l => l());
+    }
+  }
+  return cache.get(key) ?? null;
+}
+
+/** Read-modify-write against the loaded value, so concurrent updates don't drop each other. */
+export async function updatePersisted(key: string, update: (prev: string | null) => string) {
+  await loadPersisted(key);
+  save(key, update(cache.get(key) ?? null));
+}
+
+export function usePersisted(key: string) {
   const value = useSyncExternalStore(subscribe, () => cache.get(key));
   useEffect(() => {
     if (cache.has(key)) return;
