@@ -74,6 +74,14 @@ Run `npm run import:dk`. It fetches the Spanish and English `content.json` behin
 
 Write `scripts/import/<source>.ts` that outputs a `Book` to `src/data/books/<id>.json` and calls `writeCatalog()`, then add a loader to `LOADERS` in `src/lib/books.ts`. On the web each book is a separate chunk fetched when a deck opens; native bundles them all for offline use. `npm test` fails if `catalog.json` is out of date with the book files.
 
+## Profiles backend
+
+Profiles are a name and PIN, not real security. The app signs in with Supabase Auth using `<name>@vocab-cards.local` and a password derived from the PIN. `supabase/migrations/` creates `profiles` (filled by a trigger on sign-up), `topic_marks` and `word_progress`. Row level security lets each signed-in user touch only their own rows, and `anon` gets no table access.
+
+- **Apply:** the Supabase GitHub integration runs new migrations when they merge to `main`. To apply by hand, paste the migration into the SQL editor or run `psql "<connection string>" -f supabase/migrations/<file>.sql`.
+- **Dashboard step:** in Authentication → Providers → Email, turn off "Confirm email".
+- **Test:** `npm run test:db` applies the migrations to a temporary local Postgres with a stub `auth` schema and checks the access rules. It needs `initdb`, `pg_ctl` and `psql` on the PATH, and it isn't part of `npm test`.
+
 ## Roadmap
 
 - Native app with offline audio (downloaded with `expo-file-system`)
