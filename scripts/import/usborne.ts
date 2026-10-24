@@ -2,6 +2,7 @@
 // Raw file is captured from the page's window.linksConfig (see README "Importing").
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { writeCatalog } from '../build-catalog.ts';
 import type { Book, Chapter, Word } from '../../src/lib/types.ts';
 
 const AUDIO_BASE =
@@ -62,6 +63,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     chapters: parseRaw(readFileSync('raw/usborne-ftw-es.txt', 'utf8')),
   };
   writeFileSync(`src/data/books/${book.id}.json`, JSON.stringify(book, null, 2) + '\n');
+  writeCatalog();
   const words = book.chapters.flatMap(c => c.sections).reduce((n, s) => n + s.words.length, 0);
   console.log(`${book.id}: ${book.chapters.length} chapters, ${words} words`);
 }

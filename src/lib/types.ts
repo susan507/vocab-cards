@@ -26,3 +26,10 @@ export type Book = {
   source: { name: string; url: string };
   chapters: Chapter[];
 };
+
+/** A book without its words: small enough to bundle eagerly for the home and chapter screens. */
+export type CatalogBook = Omit<Book, 'chapters'> & {
+  chapters: { title: string; sections: { title?: string; count: number }[] }[];
+};
+
+export type Catalog = Record<string, CatalogBook>;

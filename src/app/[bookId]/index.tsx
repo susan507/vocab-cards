@@ -1,14 +1,12 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import type { Href } from 'expo-router';
-import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import { getBook } from '@/lib/books';
+import { StarButton } from '@/components/StarButton';
+import { deckPath, getCatalogBook, topicKey } from '@/lib/books';
+import type { Topic } from '@/lib/books';
+import { ORDERS, useDeckOrder } from '@/lib/prefs';
+import type { Order } from '@/lib/prefs';
 import { COLORS } from '@/theme';
-
-const ORDER_KEY = 'deckOrder';
-const ORDERS = { inOrder: 'In order', random: 'Random' } as const;
-type Order = keyof typeof ORDERS;
 
 const PADDING = 16;
 const GAP = 12;
@@ -17,32 +15,16 @@ const MAX_WIDTH = 1200;
 
 export default function ChaptersScreen() {
   const { bookId } = useLocalSearchParams<{ bookId: string }>();
-  const book = getBook(bookId);
-  const [order, setOrder] = useState<Order>('inOrder');
+  const book = getCatalogBook(bookId);
+  const [order, setOrder] = useDeckOrder();
   const { width } = useWindowDimensions();
-
-  useEffect(() => {
-    AsyncStorage.getItem(ORDER_KEY)
-      .then(saved => {
-        if (saved === 'random' || saved === 'inOrder') setOrder(saved);
-      })
-      .catch(() => {});
-  }, []);
-
-  const chooseOrder = (next: Order) => {
-    setOrder(next);
-    AsyncStorage.setItem(ORDER_KEY, next).catch(() => {});
-  };
 
   if (!book) return null;
 
   const inner = Math.min(width, MAX_WIDTH) - PADDING * 2;
   const columns = Math.max(1, Math.floor((inner + GAP) / (MIN_TILE + GAP)));
   const tileWidth = (inner - GAP * (columns - 1)) / columns;
-  const open = (path: string) =>
-    router.push(
-      (order === 'random' ? `${path}${path.includes('?') ? '&' : '?'}order=random` : path) as Href,
-    );
+  const open = (topic: Topic) => router.push(deckPath(topic, order === 'random') as Href);
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
@@ -53,7 +35,7 @@ export default function ChaptersScreen() {
             key={key}
             accessibilityRole="radio"
             accessibilityState={{ checked: order === key }}
-            onPress={() => chooseOrder(key)}
+            onPress={() => setOrder(key)}
             style={[styles.segment, order === key && styles.segmentActive]}
           >
             <Text style={[styles.segmentText, order === key && styles.segmentTextActive]}>
@@ -64,19 +46,22 @@ export default function ChaptersScreen() {
       </View>
       <View style={styles.grid}>
         {book.chapters.map((chapter, c) => {
-          const count = chapter.sections.reduce((n, s) => n + s.words.length, 0);
+          const count = chapter.sections.reduce((n, s) => n + s.count, 0);
           return (
             <Pressable
               key={c}
               accessibilityRole="link"
-              onPress={() => open(`/${book.id}/${c}`)}
+              onPress={() => open({ book, chapter: c })}
               style={({ pressed }) => [
                 styles.tile,
                 { width: tileWidth },
                 pressed && styles.pressed,
               ]}
             >
-              <Text style={styles.title}>{chapter.title}</Text>
+              <View style={styles.titleRow}>
+                <Text style={styles.title}>{chapter.title}</Text>
+                <StarButton topicKey={topicKey({ book, chapter: c })} />
+              </View>
               <Text style={styles.count}>{count} words</Text>
               {chapter.sections.length > 1 ? (
                 <View style={styles.chips}>
@@ -84,10 +69,11 @@ export default function ChaptersScreen() {
                     <Pressable
                       key={s}
                       accessibilityRole="link"
-                      onPress={() => open(`/${book.id}/${c}?section=${s}`)}
+                      onPress={() => open({ book, chapter: c, section: s })}
                       style={({ pressed }) => [styles.chip, pressed && styles.pressed]}
                     >
                       <Text style={styles.chipText}>{section.title ?? `Part ${s + 1}`}</Text>
+                      <StarButton topicKey={topicKey({ book, chapter: c, section: s })} />
                     </Pressable>
                   ))}
                 </View>
@@ -117,15 +103,20 @@ const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: GAP },
   tile: { backgroundColor: COLORS.surface, borderRadius: 12, padding: 16 },
   pressed: { opacity: 0.6 },
-  title: { color: COLORS.text, fontSize: 18, fontWeight: '600' },
+  titleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  title: { color: COLORS.text, fontSize: 18, fontWeight: '600', flex: 1 },
   count: { color: COLORS.muted, fontSize: 13, marginTop: 4 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
   chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
     backgroundColor: COLORS.background,
     maxWidth: '100%',
     borderRadius: 999,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: 4,
+    paddingLeft: 12,
+    paddingRight: 6,
   },
-  chipText: { color: COLORS.text, fontSize: 14 },
+  chipText: { color: COLORS.text, fontSize: 14, flexShrink: 1 },
 });

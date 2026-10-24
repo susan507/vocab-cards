@@ -1,7 +1,10 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { Deck } from '@/components/Deck';
-import { chapterDeck, getBook, shuffle } from '@/lib/books';
+import { chapterDeck, getLoadedBook, loadBook, shuffle } from '@/lib/books';
+import type { Book } from '@/lib/types';
+import { COLORS } from '@/theme';
 
 export default function ChapterDeckScreen() {
   const { bookId, chapter, section, order } = useLocalSearchParams<{
@@ -10,7 +13,13 @@ export default function ChapterDeckScreen() {
     section?: string;
     order?: string;
   }>();
-  const book = getBook(bookId);
+  const [book, setBook] = useState<Book | null | undefined>(() => getLoadedBook(bookId));
+  useEffect(() => {
+    if (book) return;
+    loadBook(bookId)
+      .then(b => setBook(b ?? null))
+      .catch(() => setBook(null));
+  }, [book, bookId]);
   const words = useMemo(() => {
     if (!book) return [];
     const deck = chapterDeck(
@@ -21,5 +30,17 @@ export default function ChapterDeckScreen() {
     return order === 'random' ? shuffle(deck) : deck;
   }, [book, chapter, section, order]);
   const close = () => (router.canGoBack() ? router.back() : router.replace(`/${bookId}`));
+  if (book === undefined) {
+    return (
+      <View style={styles.loading}>
+        <Text style={styles.loadingText}>Loading…</Text>
+      </View>
+    );
+  }
   return <Deck words={words} onClose={close} />;
 }
+
+const styles = StyleSheet.create({
+  loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  loadingText: { color: COLORS.muted, fontSize: 16 },
+});
