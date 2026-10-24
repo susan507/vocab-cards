@@ -1,0 +1,43 @@
+{
+  "name": "vocab-cards",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p scripts",
+    "test": "tsx --test 'scripts/**/*.test.ts'",
+    "import:usborne": "tsx scripts/import/usborne.ts",
+    "build:web": "expo export -p web && cp dist/index.html dist/404.html",
+    "lint": "expo lint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
+  },
+  "dependencies": {
+    "expo": "~58.0.19",
+    "expo-audio": "~58.0.10",
+    "expo-constants": "~58.0.13",
+    "expo-linking": "~58.0.14",
+    "expo-router": "~58.0.26",
+    "expo-status-bar": "~58.0.4",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.88.0",
+    "react-native-gesture-handler": "~3.3.0",
+    "react-native-safe-area-context": "~5.10.1",
+    "react-native-screens": "~4.30.0",
+    "react-native-web": "^0.21.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/react": "~19.3.0",
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~58.0.4",
+    "oxfmt": "^0.74.0",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3"
+  }
+}

@@ -1,0 +1,77 @@
+# Vocab Cards
+
+Spanish vocabulary flashcards with audio. Pick a book, then a chapter or subtopic. Each card shows Spanish on top and English below.
+
+- **Swipe left or right** (or press ← →) to go to the next or previous word
+- **Tap** (or press Space) to replay the audio
+- The audio plays once whenever a new word appears
+
+Live site: https://susan507.github.io/vocab-cards/
+
+## Stack
+
+Expo (SDK 58), React Native, TypeScript and Expo Router. The same code runs on the web (react-native-web, exported as a static SPA) and later as the native iOS/Android app.
+
+## Development
+
+```sh
+npm install
+npm run web          # dev server in the browser
+npm run typecheck
+npm test             # importer tests
+npm run build:web    # static build in dist/
+```
+
+Pushing to `main` runs CI: typecheck, test, build, then deploy to GitHub Pages.
+
+## Data
+
+```
+raw/                      captured source data, one file per import
+scripts/import/<source>.ts  turns a raw file into a book JSON
+src/data/books/*.json     generated books (committed, bundled into the app)
+src/lib/types.ts          the Book → Chapter → Section → Word format
+src/lib/books.ts          book registry and deck builders
+```
+
+The app only ever reads `Book` JSON (see `src/lib/types.ts`). Each word has `es`, `en`, an optional `audio` URL and an optional `image`. Chapters keep the source's order. A chapter without subtopics has a single section with no title.
+
+Audio is not committed. The web version streams it from the source URL, and the native app will download it on the device for offline use.
+
+### Importing: Usborne First Thousand Words in Spanish
+
+The Quicklinks page sits behind a Cloudflare check, so it's captured from a real browser:
+
+1. Open the [Quicklinks page](https://usborne.com/gb/quicklinks/quicklink/first-thousand-words-in-spanish) and run this in the console:
+   ```js
+   copy(
+     window.linksConfig.pages
+       .flatMap(p => Object.values(p.lists))
+       .filter(l => l.type === 'audiolinks')
+       .flatMap(l => l.topics)
+       .sort((a, b) => a.position - b.position)
+       .map(
+         t =>
+           '#' +
+           t.title +
+           '\n' +
+           t.links.map(k => k.url.split('/').pop().replace('.mp3', '') + '|' + k.title).join('\n'),
+       )
+       .join('\n'),
+   );
+   ```
+2. Paste the result into `raw/usborne-ftw-es.txt`, below the `# ` header comment lines.
+3. Run `npm run import:usborne`.
+
+Fixes for source typos live in `FIXES` in `scripts/import/usborne.ts`.
+
+### Adding a new source
+
+Write `scripts/import/<source>.ts` that outputs a `Book` to `src/data/books/<id>.json`, then add the book to `BOOKS` in `src/lib/books.ts`.
+
+## Roadmap
+
+- Native app with offline audio (downloaded with `expo-file-system`)
+- Spaced repetition: mark each word as known or unknown
+- Review modes: shuffle, and pick one, several or all chapters. The card screen already takes a plain `Word[]` deck, so these only need new deck builders.
+- Images on cards (`Word.image` is already rendered when present)

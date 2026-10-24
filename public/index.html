@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="%LANG_ISO_CODE%">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#1d3557" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>%WEB_TITLE%</title>
+    <style id="expo-reset">
+      /* Full-screen, no page scroll or bounce; dvh so mobile browser bars don't cause overflow. */
+      html,
+      body {
+        height: 100%;
+        height: 100dvh;
+        margin: 0;
+        overflow: hidden;
+        overscroll-behavior: none;
+        background: #1d3557;
+      }
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
