@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -113,6 +114,33 @@ export function Deck({ words, onClose }: { words: Word[]; onClose: () => void })
         ) : null}
         <Text style={[styles.es, { fontSize: esSize }]}>{word.es}</Text>
         <Text style={[styles.en, { fontSize: esSize * 0.5 }]}>{word.en}</Text>
+        {/* Visual cues only: swipe for prev/next, tap anywhere to replay. */}
+        {word.audio ? (
+          <Ionicons
+            name="volume-high-outline"
+            size={28}
+            color={COLORS.muted}
+            pointerEvents="none"
+          />
+        ) : null}
+        {index > 0 ? (
+          <Ionicons
+            name="chevron-back"
+            size={36}
+            color={COLORS.muted}
+            pointerEvents="none"
+            style={[styles.arrow, { left: 8 }]}
+          />
+        ) : null}
+        {index < words.length - 1 ? (
+          <Ionicons
+            name="chevron-forward"
+            size={36}
+            color={COLORS.muted}
+            pointerEvents="none"
+            style={[styles.arrow, { right: 8 }]}
+          />
+        ) : null}
       </View>
     </GestureDetector>
   );
@@ -139,6 +167,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   chrome: { color: COLORS.muted, fontSize: 18 },
+  arrow: { position: 'absolute', top: '50%', marginTop: -18, opacity: 0.6 },
   image: { width: '60%', height: '30%' },
   es: { color: COLORS.text, fontWeight: '600', textAlign: 'center' },
   en: { color: COLORS.muted, textAlign: 'center' },
