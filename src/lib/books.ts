@@ -45,6 +45,18 @@ export function shuffle<T>(items: readonly T[]): T[] {
   return out;
 }
 
+/** `source` in its own or a random order, keeping `current` on screen (first, when shuffled). */
+export function reorderKeeping<T>(
+  source: readonly T[],
+  current: T | undefined,
+  random: boolean,
+): { items: T[]; index: number } {
+  const i = current === undefined ? -1 : source.indexOf(current);
+  if (!random) return { items: [...source], index: Math.max(0, i) };
+  if (i < 0) return { items: shuffle(source), index: 0 };
+  return { items: [source[i], ...shuffle(source.filter((_, j) => j !== i))], index: 0 };
+}
+
 /** A chapter, or one subtopic of it. Its key (`book/chapter[/section]`) is what stars store. */
 export type Topic = { book: CatalogBook; chapter: number; section?: number };
 

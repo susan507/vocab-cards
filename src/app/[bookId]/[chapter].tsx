@@ -2,16 +2,15 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Deck } from '@/components/Deck';
-import { chapterDeck, getLoadedBook, loadBook, shuffle } from '@/lib/books';
+import { chapterDeck, getLoadedBook, loadBook } from '@/lib/books';
 import type { Book } from '@/lib/types';
 import { COLORS } from '@/theme';
 
 export default function ChapterDeckScreen() {
-  const { bookId, chapter, section, order } = useLocalSearchParams<{
+  const { bookId, chapter, section } = useLocalSearchParams<{
     bookId: string;
     chapter: string;
     section?: string;
-    order?: string;
   }>();
   const [book, setBook] = useState<Book | null | undefined>(() => getLoadedBook(bookId));
   useEffect(() => {
@@ -22,13 +21,8 @@ export default function ChapterDeckScreen() {
   }, [book, bookId]);
   const words = useMemo(() => {
     if (!book) return [];
-    const deck = chapterDeck(
-      book,
-      Number(chapter),
-      section === undefined ? undefined : Number(section),
-    );
-    return order === 'random' ? shuffle(deck) : deck;
-  }, [book, chapter, section, order]);
+    return chapterDeck(book, Number(chapter), section === undefined ? undefined : Number(section));
+  }, [book, chapter, section]);
   const close = () => (router.canGoBack() ? router.back() : router.replace(`/${bookId}`));
   if (book === undefined) {
     return (
