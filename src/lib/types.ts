@@ -2,6 +2,8 @@
 // importers live in scripts/import/, the app only ever reads this shape.
 
 export type Word = {
+  /** Stable within its book across re-imports; see `wordKey` for the global key. */
+  id: string;
   es: string;
   en: string;
   /** Absolute URL. The native app swaps it for a local file when downloaded. */

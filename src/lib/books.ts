@@ -13,6 +13,9 @@ export const CATALOG: CatalogBook[] = Object.keys(LOADERS).map(id => catalog[id]
 
 export const getCatalogBook = (id: string): CatalogBook | undefined => catalog[id];
 
+/** Global, stable key for per-word progress. */
+export const wordKey = (bookId: string, word: Word) => `${bookId}:${word.id}`;
+
 const loaded = new Map<string, Book>();
 
 export const getLoadedBook = (id: string) => loaded.get(id);

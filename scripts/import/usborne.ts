@@ -33,6 +33,9 @@ export function parseTitle(raw: string): Pick<Word, 'es' | 'en'> {
 
 export function parseRaw(text: string): Chapter[] {
   const chapters: Chapter[] = [];
+  // The id is the audio code. A repeated code with the same es/en reuses its id; one whose
+  // es/en differs (FTWS0418: oar, paddle) gets `-2`, `-3`... in source order.
+  const variants = new Map<string, string[]>();
   for (const line of text.split('\n')) {
     if (!line.trim() || line.startsWith('# ')) continue;
     if (line.startsWith('#')) {
@@ -47,7 +50,17 @@ export function parseRaw(text: string): Chapter[] {
     const [code, title] = line.split('|');
     const section = chapters.at(-1)?.sections.at(-1);
     if (!section || !title) throw new Error(`Bad line: ${line}`);
-    section.words.push({ ...parseTitle(title), audio: `${AUDIO_BASE}${code}.mp3` });
+    const word = parseTitle(title);
+    const seen = variants.get(code) ?? [];
+    variants.set(code, seen);
+    const text = `${word.es}|${word.en}`;
+    if (!seen.includes(text)) seen.push(text);
+    const n = seen.indexOf(text);
+    section.words.push({
+      id: n ? `${code}-${n + 1}` : code,
+      ...word,
+      audio: `${AUDIO_BASE}${code}.mp3`,
+    });
   }
   return chapters;
 }

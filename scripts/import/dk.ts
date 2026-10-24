@@ -50,6 +50,7 @@ export function buildChapters(es: DkContent, en: DkContent, fixes = FIXES): Chap
       const words = u.exercises.map(e => {
         const key = `${u.unit}/${e.exercise}`;
         return {
+          id: `${u.unit}.${e.exercise}`,
           es: e.text,
           en: fixes[key] ?? enText.get(key) ?? '',
           audio: `${BASE}es/audio/${e.filename}`,
