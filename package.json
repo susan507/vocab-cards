@@ -5,8 +5,8 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit && tsc --noEmit -p scripts",
     "test": "tsx --test 'scripts/**/*.test.ts'",
@@ -14,7 +14,8 @@
     "build:web": "expo export -p web && cp dist/index.html dist/404.html",
     "lint": "expo lint",
     "format": "oxfmt",
-    "format:check": "oxfmt --check"
+    "format:check": "oxfmt --check",
+    "build:android": "expo prebuild -p android --clean && cd android && ./gradlew assembleRelease"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",

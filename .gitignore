@@ -46,3 +46,11 @@ yarn-error.*
 
 # Audio is streamed from source sites (web) or downloaded on-device (app); never commit it.
 *.mp3
+
+# Native projects are generated (CNG)
+/android
+/ios
+
+# Native projects are generated (CNG)
+/android
+/ios
