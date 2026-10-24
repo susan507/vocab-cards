@@ -29,9 +29,10 @@ Pushing to `main` runs CI: typecheck, test, build, then deploy to GitHub Pages.
 ```
 raw/                      captured source data, for sources that can't be fetched
 scripts/import/<source>.ts  turns source data into a book JSON
-src/data/books/*.json     generated books (committed, bundled into the app)
+src/data/books/*.json     generated books (committed; loaded lazily when a deck opens)
+src/data/catalog.json     titles and word counts only, bundled eagerly (npm run catalog)
 src/lib/types.ts          the Book → Chapter → Section → Word format
-src/lib/books.ts          book registry and deck builders
+src/lib/books.ts          book registry, catalog, search and deck builders
 ```
 
 The app only ever reads `Book` JSON (see `src/lib/types.ts`). Each word has `es`, `en`, an optional `audio` URL and an optional `image`. Chapters keep the source's order. A chapter without subtopics has a single section with no title.
@@ -69,11 +70,9 @@ Fixes for source typos live in `FIXES` in `scripts/import/usborne.ts`.
 
 Run `npm run import:dk`. It fetches the Spanish and English `content.json` behind the [DK audio app](https://apps.dk.com/idic/en/audio/es) and joins them by unit and exercise number. Each DK unit becomes a section, and its heading (exercise 0) is also the section's first card. Fixes for misnumbered or blank English entries live in `FIXES` in `scripts/import/dk.ts`.
 
-The output (~2 MB) isn't in `BOOKS` yet: it needs lazy loading first.
-
 ### Adding a new source
 
-Write `scripts/import/<source>.ts` that outputs a `Book` to `src/data/books/<id>.json`, then add the book to `BOOKS` in `src/lib/books.ts`.
+Write `scripts/import/<source>.ts` that outputs a `Book` to `src/data/books/<id>.json` and calls `writeCatalog()`, then add a loader to `LOADERS` in `src/lib/books.ts`. On the web each book is a separate chunk fetched when a deck opens; native bundles them all for offline use. `npm test` fails if `catalog.json` is out of date with the book files.
 
 ## Roadmap
 

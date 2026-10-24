@@ -2,6 +2,7 @@
 // and joins them by (unit, exercise) -> src/data/books/dk-idic-es.json
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { writeCatalog } from '../build-catalog.ts';
 import type { Book, Chapter } from '../../src/lib/types.ts';
 
 const BASE = 'https://d2hmvvndovjpc2.cloudfront.net/efeidic/en/';
@@ -74,6 +75,7 @@ async function main() {
     chapters: buildChapters(es, en),
   };
   writeFileSync(`src/data/books/${book.id}.json`, JSON.stringify(book, null, 2) + '\n');
+  writeCatalog();
   const sections = book.chapters.flatMap(c => c.sections);
   const words = sections.flatMap(s => s.words);
   const missing = words.filter(w => !w.en).map(w => w.es);

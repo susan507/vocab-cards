@@ -1,0 +1,2904 @@
+{
+  "dk-idic-es": {
+    "id": "dk-idic-es",
+    "title": "DK Illustrated Dictionary (Spanish)",
+    "source": {
+      "name": "DK Illustrated Dictionary",
+      "url": "https://apps.dk.com/idic/en/audio/es"
+    },
+    "chapters": [
+      {
+        "title": "1 Las partes del cuerpo (Parts of the body)",
+        "sections": [
+          {
+            "title": "El cuerpo humano (The human body)",
+            "count": 27
+          },
+          {
+            "title": "El rostro (Face)",
+            "count": 17
+          },
+          {
+            "title": "Los ojos (Eyes)",
+            "count": 10
+          }
+        ]
+      },
+      {
+        "title": "2 Las manos y los pies (Hands and feet)",
+        "sections": [
+          {
+            "title": "Las manos (Hands)",
+            "count": 12
+          },
+          {
+            "title": "Los verbos del cuerpo (Body verbs)",
+            "count": 25
+          },
+          {
+            "title": "Los pies (Feet)",
+            "count": 12
+          }
+        ]
+      },
+      {
+        "title": "3 Los músculos y el esqueleto (Muscles and skeleton)",
+        "sections": [
+          {
+            "title": "Los músculos (Muscles)",
+            "count": 18
+          },
+          {
+            "title": "Los dientes (Teeth)",
+            "count": 12
+          },
+          {
+            "title": "El esqueleto (Skeleton)",
+            "count": 33
+          }
+        ]
+      },
+      {
+        "title": "4 Los órganos internos (Internal organs)",
+        "sections": [
+          {
+            "title": "Los órganos internos (Internal organs)",
+            "count": 15
+          },
+          {
+            "title": "Los sistemas corporales (Body systems)",
+            "count": 11
+          },
+          {
+            "title": "La cabeza (Head)",
+            "count": 13
+          },
+          {
+            "title": "Los órganos reproductores (Reproductive organs)",
+            "count": 13
+          }
+        ]
+      },
+      {
+        "title": "5 La familia (Family)",
+        "sections": [
+          {
+            "title": "La familia de Carlos (Carlo's family)",
+            "count": 30
+          },
+          {
+            "title": "La familia de Sara (Sarah's family)",
+            "count": 6
+          },
+          {
+            "title": "Las relaciones (Relationships)",
+            "count": 15
+          },
+          {
+            "title": "El crecimiento (Growing up)",
+            "count": 11
+          }
+        ]
+      },
+      {
+        "title": "6 Los estados de ánimo (Feelings and moods)",
+        "sections": [
+          {
+            "title": "Los estados de ánimo (Feelings and moods)",
+            "count": 59
+          }
+        ]
+      },
+      {
+        "title": "7 Los acontecimientos de la vida (Life events)",
+        "sections": [
+          {
+            "title": "Las relaciones (Relationships)",
+            "count": 16
+          },
+          {
+            "title": "Acontecimientos de la vida (Life events)",
+            "count": 25
+          },
+          {
+            "title": "Las fiestas y las celebraciones (Festivals and celebrations)",
+            "count": 18
+          }
+        ]
+      },
+      {
+        "title": "8 El embarazo y la infancia (Pregnancy and childhood)",
+        "sections": [
+          {
+            "title": "El embarazo y el parto (Pregnancy and childbirth)",
+            "count": 16
+          },
+          {
+            "title": "Los juegos y los juguetes (Toys and games)",
+            "count": 24
+          },
+          {
+            "title": "La infancia (Childhood)",
+            "count": 20
+          }
+        ]
+      },
+      {
+        "title": "9 Las rutinas diarias (Daily routines)",
+        "sections": [
+          {
+            "title": "Por la mañana y por la tarde (Morning and afternoon)",
+            "count": 33
+          },
+          {
+            "title": "Por la noche (Evening)",
+            "count": 18
+          },
+          {
+            "title": "Otras actividades (Other activities)",
+            "count": 19
+          }
+        ]
+      },
+      {
+        "title": "10 Los rasgos de personalidad (Personality traits)",
+        "sections": [
+          {
+            "title": "Describir la personalidad (Describing personalities)",
+            "count": 60
+          }
+        ]
+      },
+      {
+        "title": "11 Las habilidades y las acciones (Abilities and actions)",
+        "sections": [
+          {
+            "title": "Describir las habilidades y las acciones (Describing personalities)",
+            "count": 68
+          }
+        ]
+      },
+      {
+        "title": "12 La apariencia y el cabello (Appearance and hair)",
+        "sections": [
+          {
+            "title": "La apariencia general (General appearance)",
+            "count": 14
+          },
+          {
+            "title": "El pelo (Hair)",
+            "count": 55
+          }
+        ]
+      },
+      {
+        "title": "13 La ropa (Clothes)",
+        "sections": [
+          {
+            "title": "Describir la ropa (Describing clothes)",
+            "count": 19
+          },
+          {
+            "title": "El uniforme de trabajo (Work clothes and uniforms)",
+            "count": 16
+          },
+          {
+            "title": "La ropa de bebé y de niño (Kids' and babies' clothes)",
+            "count": 14
+          }
+        ]
+      },
+      {
+        "title": "14 La ropa (continuación) (Clothes continued)",
+        "sections": [
+          {
+            "title": "La ropa informal (Casual clothes)",
+            "count": 23
+          },
+          {
+            "title": "La ropa de dormir (Nightwear)",
+            "count": 7
+          },
+          {
+            "title": "La ropa interior (Underwear)",
+            "count": 13
+          },
+          {
+            "title": "Los verbos para la ropa (Verbs for clothes)",
+            "count": 13
+          }
+        ]
+      },
+      {
+        "title": "15 La ropa (continuación) (Clothes continued)",
+        "sections": [
+          {
+            "title": "La ropa formal (Formal wear)",
+            "count": 29
+          },
+          {
+            "title": "Los abrigos (Coats)",
+            "count": 16
+          },
+          {
+            "title": "La ropa deportiva (Sportswear)",
+            "count": 11
+          },
+          {
+            "title": "La ropa tradicional (Traditional clothes)",
+            "count": 10
+          }
+        ]
+      },
+      {
+        "title": "16 Los Accesorios (Accessories)",
+        "sections": [
+          {
+            "title": "Los accesorios de moda (Fashion accessories)",
+            "count": 13
+          },
+          {
+            "title": "La joyería (Jewelry (US) / Jewellery (UK))",
+            "count": 21
+          },
+          {
+            "title": "Los sombreros (Headwear)",
+            "count": 19
+          },
+          {
+            "title": "Los bolsos (Bags)",
+            "count": 11
+          }
+        ]
+      },
+      {
+        "title": "17 El calzado (Shoes)",
+        "sections": [
+          {
+            "title": "El calzado y los accesorios (Shoes and accessories)",
+            "count": 37
+          },
+          {
+            "title": "Las botas (Boots)",
+            "count": 16
+          },
+          {
+            "title": "El calzado deportivo (Sports shoes)",
+            "count": 14
+          }
+        ]
+      },
+      {
+        "title": "18 La belleza (Beauty)",
+        "sections": [
+          {
+            "title": "El maquillaje (Makeup)",
+            "count": 16
+          },
+          {
+            "title": "Los tipos de piel (Skin type)",
+            "count": 6
+          },
+          {
+            "title": "La manicura (Manicure)",
+            "count": 7
+          },
+          {
+            "title": "La cosmética y los tratamientos de belleza (Toiletries and beauty treatments)",
+            "count": 22
+          }
+        ]
+      },
+      {
+        "title": "19 Las enfermedades y lesiones (Illness and injury)",
+        "sections": [
+          {
+            "title": "Las enfermedades (Illness)",
+            "count": 37
+          },
+          {
+            "title": "Las lesiones (Injury)",
+            "count": 28
+          }
+        ]
+      },
+      {
+        "title": "20 La visita al médico (Visiting the doctor)",
+        "sections": [
+          {
+            "title": "El tratamiento (Treatment)",
+            "count": 30
+          },
+          {
+            "title": "El botiquín de primeros auxilios (First-aid kit)",
+            "count": 12
+          },
+          {
+            "title": "Los verbos para describir las enfermedades (Verbs to describe illness)",
+            "count": 18
+          }
+        ]
+      },
+      {
+        "title": "21 El hospital (The hospital)",
+        "sections": [
+          {
+            "title": "En el hospital (At the hospital)",
+            "count": 42
+          },
+          {
+            "title": "Los departamentos (Departments)",
+            "count": 19
+          }
+        ]
+      },
+      {
+        "title": "22 El dentista y el oculista (The dentist and optician)",
+        "sections": [
+          {
+            "title": "La clínica dental (Dentist's office (US) / Dental surgery (UK))",
+            "count": 28
+          },
+          {
+            "title": "El oculista (Optician)",
+            "count": 30
+          }
+        ]
+      },
+      {
+        "title": "23 La dieta y la nutrición (Diet and nutrition)",
+        "sections": [
+          {
+            "title": "La vida sana (Healthy living)",
+            "count": 42
+          },
+          {
+            "title": "Las alergias alimentarias (Food allergies)",
+            "count": 16
+          }
+        ]
+      },
+      {
+        "title": "24 Cuerpo sano, mente sana (Healthy body, healthy mind)",
+        "sections": [
+          {
+            "title": "El yoga (Yoga)",
+            "count": 27
+          },
+          {
+            "title": "Los tratamientos y las terapias (Treatments and therapy)",
+            "count": 31
+          }
+        ]
+      },
+      {
+        "title": "25 Un lugar donde vivir (A place to live)",
+        "sections": [
+          {
+            "title": "La vivienda (Houses)",
+            "count": 47
+          },
+          {
+            "title": "El rellano (Hallway)",
+            "count": 15
+          }
+        ]
+      },
+      {
+        "title": "26 El salón y el comedor (Living room and dining room)",
+        "sections": [
+          {
+            "title": "El salón (Living room)",
+            "count": 30
+          },
+          {
+            "title": "El comedor (Dining room)",
+            "count": 29
+          }
+        ]
+      },
+      {
+        "title": "27 La cocina y la vajilla (Kitchen and tableware)",
+        "sections": [
+          {
+            "title": "Los electrodomésticos (Kitchen appliances)",
+            "count": 28
+          },
+          {
+            "title": "La vajilla (Tableware)",
+            "count": 37
+          }
+        ]
+      },
+      {
+        "title": "28 El menaje de cocina (Kitchenware)",
+        "sections": [
+          {
+            "title": "Los utensilios de cocina (Kitchen equipment)",
+            "count": 61
+          }
+        ]
+      },
+      {
+        "title": "29 La cocina (Cooking)",
+        "sections": [
+          {
+            "title": "Los verbos para cocinar (Cooking verbs)",
+            "count": 41
+          },
+          {
+            "title": "Hornear (Baking)",
+            "count": 16
+          }
+        ]
+      },
+      {
+        "title": "30 El dormitorio (Bedroom)",
+        "sections": [
+          {
+            "title": "El dormitorio (Bedroom)",
+            "count": 38
+          },
+          {
+            "title": "La habitación del bebé (Nursery)",
+            "count": 12
+          }
+        ]
+      },
+      {
+        "title": "31 El cuarto de baño (Bathroom)",
+        "sections": [
+          {
+            "title": "En el cuarto de baño (In the bathroom)",
+            "count": 52
+          }
+        ]
+      },
+      {
+        "title": "32 La casa y el hogar (House and home)",
+        "sections": [
+          {
+            "title": "Los tipos de casas (Types of house)",
+            "count": 30
+          },
+          {
+            "title": "La compra y el alquiler de una casa (Buying and renting a house)",
+            "count": 32
+          }
+        ]
+      },
+      {
+        "title": "33 La electricidad y la fontanería (Electrics and plumbing)",
+        "sections": [
+          {
+            "title": "La electricidad (Electricity)",
+            "count": 36
+          },
+          {
+            "title": "La fontanería (Plumbing)",
+            "count": 22
+          },
+          {
+            "title": "Los residuos (Waste)",
+            "count": 10
+          }
+        ]
+      },
+      {
+        "title": "34 Las tareas domésticas (Household chores)",
+        "sections": [
+          {
+            "title": "Las tareas de casa (Household tasks)",
+            "count": 30
+          },
+          {
+            "title": "La colada y la limpieza (Laundry and cleaning)",
+            "count": 37
+          }
+        ]
+      },
+      {
+        "title": "35 El bricolaje (Home improvements)",
+        "sections": [
+          {
+            "title": "Las herramientas y los aparatos (Tools and DIY equipment)",
+            "count": 18
+          },
+          {
+            "title": "Los verbos de bricolaje (DIY verbs)",
+            "count": 24
+          },
+          {
+            "title": "Los materiales (Materials)",
+            "count": 20
+          }
+        ]
+      },
+      {
+        "title": "36 Las herramientas (Tools)",
+        "sections": [
+          {
+            "title": "La caja de herramientas (Toolbox)",
+            "count": 10
+          },
+          {
+            "title": "Las brocas (Drill bits)",
+            "count": 7
+          },
+          {
+            "title": "Las herramientas (Tools)",
+            "count": 35
+          }
+        ]
+      },
+      {
+        "title": "37 La decoración (Decorating)",
+        "sections": [
+          {
+            "title": "Las reformas (Household renovation)",
+            "count": 46
+          },
+          {
+            "title": "Verbos de decoración (Verbs for decorating)",
+            "count": 7
+          }
+        ]
+      },
+      {
+        "title": "38 Las plantas de interior y de jardín (Garden plants and houseplants)",
+        "sections": [
+          {
+            "title": "Las plantas de jardín y las flores (Garden plants and flowers)",
+            "count": 42
+          },
+          {
+            "title": "Las plantas de interior (Houseplants)",
+            "count": 15
+          },
+          {
+            "title": "La anatomía de la flor (Flower anatomy)",
+            "count": 11
+          }
+        ]
+      },
+      {
+        "title": "39 La jardinería (Practical gardening)",
+        "sections": [
+          {
+            "title": "Los verbos de jardinería (Gardening verbs)",
+            "count": 43
+          },
+          {
+            "title": "Los tipos de suelo (Types of soil)",
+            "count": 12
+          }
+        ]
+      },
+      {
+        "title": "40 Las herramientas de jardinería (Garden tools)",
+        "sections": [
+          {
+            "title": "Los útiles de jardinería (Gardening equipment)",
+            "count": 48
+          },
+          {
+            "title": "El riego (Watering)",
+            "count": 7
+          }
+        ]
+      },
+      {
+        "title": "41 Los elementos del jardín (Garden features)",
+        "sections": [
+          {
+            "title": "Los estilos y adornos de jardín (Garden types and features)",
+            "count": 34
+          },
+          {
+            "title": "Los tipos de plantas (Types of plants)",
+            "count": 25
+          }
+        ]
+      },
+      {
+        "title": "42 La ciudad (In town)",
+        "sections": [
+          {
+            "title": "Los edificios y otros elementos (Buildings and other features)",
+            "count": 39
+          }
+        ]
+      },
+      {
+        "title": "43 La ciudad (continuación) (In town continued)",
+        "sections": [
+          {
+            "title": "Los edificios y otros elementos (Buildings and other features)",
+            "count": 36
+          },
+          {
+            "title": "El parque infantil (Playground)",
+            "count": 6
+          }
+        ]
+      },
+      {
+        "title": "44 Los edificios y la arquitectura (Buildings and architecture)",
+        "sections": [
+          {
+            "title": "Los tipos de edificios (Types of buildings)",
+            "count": 37
+          },
+          {
+            "title": "Los edificios y los monumentos famosos (Famous buildings and monuments)",
+            "count": 20
+          }
+        ]
+      },
+      {
+        "title": "45 El banco y la oficina de correos (The bank and post office)",
+        "sections": [
+          {
+            "title": "El banco (Bank)",
+            "count": 27
+          },
+          {
+            "title": "El dinero (Money)",
+            "count": 13
+          },
+          {
+            "title": "La oficina de correos (Post office)",
+            "count": 21
+          }
+        ]
+      },
+      {
+        "title": "46 Las compras (Shopping)",
+        "sections": [
+          {
+            "title": "En la calle principal (On the main street (US) / high street (UK))",
+            "count": 39
+          },
+          {
+            "title": "Los verbos de compras (Shopping verbs)",
+            "count": 13
+          },
+          {
+            "title": "Las compras en línea (Ordering online)",
+            "count": 6
+          }
+        ]
+      },
+      {
+        "title": "47 El centro comercial (The shopping mall)",
+        "sections": [
+          {
+            "title": "El centro comercial (Shopping mall (US) / Shopping centre (UK))",
+            "count": 42
+          },
+          {
+            "title": "El puesto de flores (Flower stall)",
+            "count": 16
+          }
+        ]
+      },
+      {
+        "title": "48 El supermercado (The supermarket)",
+        "sections": [
+          {
+            "title": "El supermercado (Supermarket)",
+            "count": 13
+          },
+          {
+            "title": "La caja (Checkout)",
+            "count": 14
+          },
+          {
+            "title": "Los pasillos / Las secciones (Aisles / Sections)",
+            "count": 19
+          },
+          {
+            "title": "El kiosco (Newsstand / Kiosk)",
+            "count": 12
+          }
+        ]
+      },
+      {
+        "title": "49 La farmacia (The pharmacy)",
+        "sections": [
+          {
+            "title": "La farmacia (Pharmacy)",
+            "count": 65
+          }
+        ]
+      },
+      {
+        "title": "50 Los servicios de emergencias (Emergency services)",
+        "sections": [
+          {
+            "title": "Los accidentes y las emergencias (Accident and Emergency)",
+            "count": 14
+          },
+          {
+            "title": "El cuerpo de bomberos (Fire department (US) / Fire brigade (US))",
+            "count": 20
+          },
+          {
+            "title": "La policía (Police)",
+            "count": 37
+          }
+        ]
+      },
+      {
+        "title": "51 La energía y el suministro eléctrico (Energy and power supply)",
+        "sections": [
+          {
+            "title": "La energía nuclear y los combustibles fósiles (Nuclear energy and fossil fuels)",
+            "count": 32
+          },
+          {
+            "title": "La energía renovable (Renewable energy)",
+            "count": 29
+          }
+        ]
+      },
+      {
+        "title": "52 Beber y comer (Drinking and eating)",
+        "sections": [
+          {
+            "title": "Las bebidas (Drinks)",
+            "count": 19
+          },
+          {
+            "title": "Los recipientes (Containers)",
+            "count": 13
+          },
+          {
+            "title": "Los adjetivos (Adjectives)",
+            "count": 19
+          },
+          {
+            "title": "Los verbos para comer y beber (Drinking and eating verbs)",
+            "count": 12
+          }
+        ]
+      },
+      {
+        "title": "53 La carne (Meat)",
+        "sections": [
+          {
+            "title": "El carnicero (The butcher)",
+            "count": 21
+          },
+          {
+            "title": "Los tipos de carne (Types of meat)",
+            "count": 13
+          },
+          {
+            "title": "La carne de ave (Poultry)",
+            "count": 9
+          },
+          {
+            "title": "Los cortes de carne (Cuts of meat)",
+            "count": 14
+          }
+        ]
+      },
+      {
+        "title": "54 El pescado y el marisco (Fish and seafood)",
+        "sections": [
+          {
+            "title": "El pescado (Fish)",
+            "count": 33
+          },
+          {
+            "title": "El marisco (Seafood)",
+            "count": 17
+          },
+          {
+            "title": "La preparación (Preparation)",
+            "count": 11
+          }
+        ]
+      },
+      {
+        "title": "55 La verdura (Vegetables)",
+        "sections": [
+          {
+            "title": "La verdura (Vegetables)",
+            "count": 41
+          },
+          {
+            "title": "Las verduras para ensalada (Salad vegetables)",
+            "count": 15
+          }
+        ]
+      },
+      {
+        "title": "56 La verdura (continuación) (Vegetables continued)",
+        "sections": [
+          {
+            "title": "En la verdulería (At the grocery store (US) / greengrocers (UK))",
+            "count": 59
+          }
+        ]
+      },
+      {
+        "title": "57 La fruta (Fruit)",
+        "sections": [
+          {
+            "title": "Los cítricos (Citrus fruit)",
+            "count": 13
+          },
+          {
+            "title": "Describir la fruta (Describing fruit)",
+            "count": 19
+          },
+          {
+            "title": "Las bayas y las frutas con hueso (Berries and stone fruit)",
+            "count": 26
+          }
+        ]
+      },
+      {
+        "title": "58 La fruta y los frutos secos (Fruit and nuts)",
+        "sections": [
+          {
+            "title": "Los melones (Melons)",
+            "count": 7
+          },
+          {
+            "title": "Otras frutas (Other fruit)",
+            "count": 23
+          },
+          {
+            "title": "Los frutos secos y la fruta deshidratada (Nuts and dried fruit)",
+            "count": 25
+          }
+        ]
+      },
+      {
+        "title": "59 Las hierbas y las especias (Herbs and spices)",
+        "sections": [
+          {
+            "title": "Las especias (Spices)",
+            "count": 35
+          },
+          {
+            "title": "Las hierbas (Herbs)",
+            "count": 24
+          }
+        ]
+      },
+      {
+        "title": "60 La despensa (In the pantry)",
+        "sections": [
+          {
+            "title": "Las botellas de aceite (Bottled oils)",
+            "count": 19
+          },
+          {
+            "title": "Las confituras (Sweet spreads)",
+            "count": 15
+          },
+          {
+            "title": "Las salsas y los condimentos (Sauces and condiments)",
+            "count": 22
+          },
+          {
+            "title": "Los encurtidos (Pickles)",
+            "count": 12
+          }
+        ]
+      },
+      {
+        "title": "61 Los productos lácteos (Dairy produce)",
+        "sections": [
+          {
+            "title": "El queso (Cheese)",
+            "count": 13
+          },
+          {
+            "title": "Los huevos (Eggs)",
+            "count": 14
+          },
+          {
+            "title": "La leche (Milk)",
+            "count": 7
+          },
+          {
+            "title": "Los productos lácteos (Milk products)",
+            "count": 29
+          }
+        ]
+      },
+      {
+        "title": "62 La panadería (The bakery)",
+        "sections": [
+          {
+            "title": "Los panes y las harinas (Breads and flours)",
+            "count": 55
+          }
+        ]
+      },
+      {
+        "title": "63 La panadería (continuación) (The bakery continued)",
+        "sections": [
+          {
+            "title": "Las tartas y los postres (Cakes and desserts)",
+            "count": 31
+          },
+          {
+            "title": "Las galletas (Cookies and biscuits)",
+            "count": 7
+          },
+          {
+            "title": "Las tartas para celebraciones (Celebration cakes)",
+            "count": 16
+          }
+        ]
+      },
+      {
+        "title": "64 La delicatessen (The delicatessen)",
+        "sections": [
+          {
+            "title": "Las delicatessen (Delicatessen)",
+            "count": 48
+          },
+          {
+            "title": "La pasta y los fideos (Pasta and noodles)",
+            "count": 15
+          }
+        ]
+      },
+      {
+        "title": "65 En la cafetería (At the café)",
+        "sections": [
+          {
+            "title": "La cafetería (Café)",
+            "count": 30
+          },
+          {
+            "title": "Los zumos y los batidos (Juices and milkshakes)",
+            "count": 13
+          },
+          {
+            "title": "La comida y los tentempiés (Food and snacks)",
+            "count": 11
+          }
+        ]
+      },
+      {
+        "title": "66 En la cafetería (continuación) (At the café continued)",
+        "sections": [
+          {
+            "title": "El té (Tea)",
+            "count": 13
+          }
+        ]
+      },
+      {
+        "title": "67 Las golosinas (Candy (US) / Sweets (UK))",
+        "sections": [
+          {
+            "title": "La tienda de golosinas (Candy store (US) / Sweet shop (UK))",
+            "count": 21
+          }
+        ]
+      },
+      {
+        "title": "68 En el bar (At the bar)",
+        "sections": [
+          {
+            "title": "El bar (Bar)",
+            "count": 19
+          },
+          {
+            "title": "La cerveza y el vino (Beer and wine)",
+            "count": 13
+          },
+          {
+            "title": "Las bebidas (Drinks)",
+            "count": 25
+          },
+          {
+            "title": "Los aperitivos (bar snacks)",
+            "count": 7
+          }
+        ]
+      },
+      {
+        "title": "69 En el restaurante (At the restaurant)",
+        "sections": [
+          {
+            "title": "El restaurante (Restaurant)",
+            "count": 49
+          }
+        ]
+      },
+      {
+        "title": "70 La comida rápida (Fast food)",
+        "sections": [
+          {
+            "title": "En el restaurante de comida rápida (In a fast-food restaurant)",
+            "count": 58
+          }
+        ]
+      },
+      {
+        "title": "71 La comida rápida (Breakfast)",
+        "sections": [
+          {
+            "title": "El bufét de desayuno (Breakfast buffet)",
+            "count": 33
+          },
+          {
+            "title": "El desayuno cocinado (Cooked breakfast)",
+            "count": 26
+          }
+        ]
+      },
+      {
+        "title": "72 El almuerzo y la cena (Lunch and dinner)",
+        "sections": [
+          {
+            "title": "Las comidas y los platos (Meals and dishes)",
+            "count": 43
+          },
+          {
+            "title": "La preparación de los alimentos (Food preparation)",
+            "count": 19
+          }
+        ]
+      },
+      {
+        "title": "73 En la escuela (At school)",
+        "sections": [
+          {
+            "title": "La escuela y los estudios (School and study)",
+            "count": 36
+          },
+          {
+            "title": "Los verbos de la escuela (School verbs)",
+            "count": 16
+          },
+          {
+            "title": "El material escolar (Equipment)",
+            "count": 19
+          }
+        ]
+      },
+      {
+        "title": "74 Las matemáticas (Mathematics)",
+        "sections": [
+          {
+            "title": "Las formas (Shapes)",
+            "count": 20
+          },
+          {
+            "title": "Las figuras espaciales (Solids)",
+            "count": 9
+          },
+          {
+            "title": "Las líneas (Lines)",
+            "count": 6
+          },
+          {
+            "title": "Las unidades de medida (Measurements)",
+            "count": 11
+          },
+          {
+            "title": "Las operaciones (Operations)",
+            "count": 13
+          },
+          {
+            "title": "Los instrumentos matemáticos (Mathematical equipment)",
+            "count": 7
+          }
+        ]
+      },
+      {
+        "title": "75 La física (Physics)",
+        "sections": [
+          {
+            "title": "La física (Physics)",
+            "count": 38
+          },
+          {
+            "title": "La óptica (Optics)",
+            "count": 13
+          }
+        ]
+      },
+      {
+        "title": "76 La química (Chemistry)",
+        "sections": [
+          {
+            "title": "En el laboratorio (In the laboratory)",
+            "count": 54
+          }
+        ]
+      },
+      {
+        "title": "77 La biología (Biology)",
+        "sections": [
+          {
+            "title": "La biología (Biology)",
+            "count": 49
+          },
+          {
+            "title": "La metamorfosis (Metamorphosis)",
+            "count": 11
+          }
+        ]
+      },
+      {
+        "title": "78 La tabla periódica (The periodic table)",
+        "sections": [
+          {
+            "title": "La tabla periódica (The periodic table)",
+            "count": 131
+          }
+        ]
+      },
+      {
+        "title": "79 La historia (History)",
+        "sections": [
+          {
+            "title": "La guerra y las armas (War and weapons)",
+            "count": 20
+          },
+          {
+            "title": "Las personas a través del tiempo (People through time)",
+            "count": 28
+          },
+          {
+            "title": "Estudiando el pasado (Studying the past)",
+            "count": 14
+          }
+        ]
+      },
+      {
+        "title": "80 En la universidad (At college)",
+        "sections": [
+          {
+            "title": "La universidad (College (US) / University (UK))",
+            "count": 21
+          },
+          {
+            "title": "Los departamentos y las facultades (Departments and schools)",
+            "count": 23
+          },
+          {
+            "title": "La biblioteca (Library)",
+            "count": 15
+          }
+        ]
+      },
+      {
+        "title": "81 En el trabajo (At work)",
+        "sections": [
+          {
+            "title": "El trabajo de oficina (Office work)",
+            "count": 54
+          },
+          {
+            "title": "El salario (Pay)",
+            "count": 10
+          }
+        ]
+      },
+      {
+        "title": "82 En la oficina (In the office)",
+        "sections": [
+          {
+            "title": "La oficina (Office)",
+            "count": 17
+          },
+          {
+            "title": "El equipo de la sala de reuniones (Meeting-room equipment)",
+            "count": 8
+          },
+          {
+            "title": "Los materiales de oficina (Office equipment)",
+            "count": 37
+          }
+        ]
+      },
+      {
+        "title": "83 Los ordenadores y la tecnología (Computers and technology)",
+        "sections": [
+          {
+            "title": "Los dispositivos y la tecnología (Gadgets and technology)",
+            "count": 35
+          },
+          {
+            "title": "La comunicación en línea (Online communication)",
+            "count": 32
+          }
+        ]
+      },
+      {
+        "title": "84 Los medios de comunicación (Media)",
+        "sections": [
+          {
+            "title": "El estudio de televisión (Television studio)",
+            "count": 13
+          },
+          {
+            "title": "La radio (Radio)",
+            "count": 12
+          },
+          {
+            "title": "Los medios en línea y las redes sociales (Social and online media)",
+            "count": 31
+          }
+        ]
+      },
+      {
+        "title": "85 El derecho (Law)",
+        "sections": [
+          {
+            "title": "El sistema judicial (The legal system)",
+            "count": 51
+          },
+          {
+            "title": "El crimen (Crime)",
+            "count": 15
+          }
+        ]
+      },
+      {
+        "title": "86 La agricultura (Farming)",
+        "sections": [
+          {
+            "title": "En la granja (On the farm)",
+            "count": 19
+          },
+          {
+            "title": "Los verbos de la granja (Farming verbs)",
+            "count": 7
+          },
+          {
+            "title": "El vocabulario de la granja (Farming terms)",
+            "count": 13
+          },
+          {
+            "title": "Los cultivos (Crops)",
+            "count": 19
+          }
+        ]
+      },
+      {
+        "title": "87 La construcción (Construction)",
+        "sections": [
+          {
+            "title": "La obra (Construction site (US) / Building site (UK))",
+            "count": 26
+          },
+          {
+            "title": "La maquinaria (Machinery)",
+            "count": 14
+          },
+          {
+            "title": "Las herramientas y las obras en la carretera (Tools and roadworks)",
+            "count": 14
+          }
+        ]
+      },
+      {
+        "title": "88 El ejército (Military)",
+        "sections": [
+          {
+            "title": "Las fuerzas armadas (Armed forces)",
+            "count": 16
+          },
+          {
+            "title": "Los vehículos militares (Military vehicles)",
+            "count": 8
+          },
+          {
+            "title": "Los buques de la armada (Navy vessels)",
+            "count": 7
+          },
+          {
+            "title": "Los aviones de combate (Combat aircraft)",
+            "count": 7
+          },
+          {
+            "title": "La guerra y las armas (War and weapons)",
+            "count": 19
+          }
+        ]
+      },
+      {
+        "title": "89 Los trabajos (Jobs)",
+        "sections": [
+          {
+            "title": "Las profesiones (Occupations)",
+            "count": 66
+          }
+        ]
+      },
+      {
+        "title": "90 Los trabajos (continuación) (Jobs continued)",
+        "sections": [
+          {
+            "title": "Las profesiones (Occupations)",
+            "count": 51
+          }
+        ]
+      },
+      {
+        "title": "91 Las industrias y los departamentos (Industries and departments)",
+        "sections": [
+          {
+            "title": "Las industrias (Industries)",
+            "count": 44
+          },
+          {
+            "title": "Los departamentos (Departments)",
+            "count": 14
+          }
+        ]
+      },
+      {
+        "title": "92 Presentarse para un puesto de trabajo (Applying for a job)",
+        "sections": [
+          {
+            "title": "La solicitud de empleo (Job applications)",
+            "count": 9
+          },
+          {
+            "title": "Presentarse para un puesto de trabajo (Applying for a job)",
+            "count": 12
+          },
+          {
+            "title": "El trabajo en equipo (Teamwork)",
+            "count": 14
+          }
+        ]
+      },
+      {
+        "title": "93 Las competencias laborales (Workplace skills)",
+        "sections": [
+          {
+            "title": "Los atributos profesionales (Professional attributes)",
+            "count": 32
+          },
+          {
+            "title": "Las habilidades profesionales (Professional expertise)",
+            "count": 33
+          }
+        ]
+      },
+      {
+        "title": "94 El dinero y las finanzas (Money and finance)",
+        "sections": [
+          {
+            "title": "El dinero (Money)",
+            "count": 25
+          },
+          {
+            "title": "Las finanzas (Finance)",
+            "count": 25
+          }
+        ]
+      },
+      {
+        "title": "95 Reuniéndose y presentando (Meeting and presenting)",
+        "sections": [
+          {
+            "title": "Reuniéndose (Meeting)",
+            "count": 22
+          },
+          {
+            "title": "Presentando (Presenting)",
+            "count": 24
+          }
+        ]
+      },
+      {
+        "title": "96 Las carreteras (Roads)",
+        "sections": [
+          {
+            "title": "Por la carretera (On the road)",
+            "count": 30
+          },
+          {
+            "title": "Las señales de tráfico (Road signs)",
+            "count": 18
+          },
+          {
+            "title": "Los verbos de conducción (Verbs for driving)",
+            "count": 11
+          }
+        ]
+      },
+      {
+        "title": "97 Los coches (Cars)",
+        "sections": [
+          {
+            "title": "El exterior del coche (Car exterior)",
+            "count": 22
+          },
+          {
+            "title": "Los tipos de coches (Types of cars)",
+            "count": 19
+          },
+          {
+            "title": "La gasolinera (Gas station (US) / Petrol station (UK))",
+            "count": 12
+          }
+        ]
+      },
+      {
+        "title": "98 Los coches (continuación) (Cars continued)",
+        "sections": [
+          {
+            "title": "La asistencia en carretera (Breakdown assistance)",
+            "count": 9
+          },
+          {
+            "title": "La mecánica (Mechanics)",
+            "count": 27
+          },
+          {
+            "title": "Los verbos de conducción (Verbs for driving)",
+            "count": 16
+          }
+        ]
+      },
+      {
+        "title": "99 Los coches y los autobuses (Cars and buses)",
+        "sections": [
+          {
+            "title": "El interior del coche (Car interior)",
+            "count": 16
+          },
+          {
+            "title": "El salpicadero y los controles (Dashboard and controls)",
+            "count": 14
+          },
+          {
+            "title": "El autobús (Bus)",
+            "count": 16
+          },
+          {
+            "title": "Los tipos de autobuses (Types of buses)",
+            "count": 14
+          }
+        ]
+      },
+      {
+        "title": "100 Las motocicletas (Motorcycles)",
+        "sections": [
+          {
+            "title": "La moto (Motorcycle (US) / Motorbike (UK))",
+            "count": 36
+          },
+          {
+            "title": "Los tipos de motos (Types of motorcycles)",
+            "count": 17
+          }
+        ]
+      },
+      {
+        "title": "101 El ciclismo (Cycling)",
+        "sections": [
+          {
+            "title": "La bicicleta (Bicycle)",
+            "count": 61
+          }
+        ]
+      },
+      {
+        "title": "102 Los trenes (Trains)",
+        "sections": [
+          {
+            "title": "La estación de tren (Train station)",
+            "count": 42
+          },
+          {
+            "title": "Los tipos de tren (Types of trains)",
+            "count": 18
+          }
+        ]
+      },
+      {
+        "title": "103 El avión (Aircraft)",
+        "sections": [
+          {
+            "title": "El avión de pasajeros (Passenger airplane (US) / Passenger aeroplane (UK))",
+            "count": 22
+          },
+          {
+            "title": "La cabina (Cabin)",
+            "count": 11
+          },
+          {
+            "title": "Los tipos de avión (Types of aircraft)",
+            "count": 21
+          }
+        ]
+      },
+      {
+        "title": "104 En el aeropuerto (At the airport)",
+        "sections": [
+          {
+            "title": "En la terminal (At the terminal)",
+            "count": 61
+          }
+        ]
+      },
+      {
+        "title": "105 Los buques (Sea vessels)",
+        "sections": [
+          {
+            "title": "El buque (Ship)",
+            "count": 24
+          },
+          {
+            "title": "Otros barcos y buques (Other boats and ships)",
+            "count": 26
+          }
+        ]
+      },
+      {
+        "title": "106 El puerto (The port)",
+        "sections": [
+          {
+            "title": "En el muelle (At the docks)",
+            "count": 37
+          },
+          {
+            "title": "Los verbos (Verbs)",
+            "count": 7
+          }
+        ]
+      },
+      {
+        "title": "107 El fútbol americano (American football)",
+        "sections": [
+          {
+            "title": "El fútbol americano (American football)",
+            "count": 75
+          }
+        ]
+      },
+      {
+        "title": "108 El rugby (Rugby)",
+        "sections": [
+          {
+            "title": "El rugby (Rugby)",
+            "count": 45
+          }
+        ]
+      },
+      {
+        "title": "109 El fútbol (Soccer (US) / Football (UK))",
+        "sections": [
+          {
+            "title": "El partido de fútbol (Soccer game (US) / Football game (UK))",
+            "count": 26
+          },
+          {
+            "title": "Los tiempos y las reglas (Timing and rules)",
+            "count": 23
+          }
+        ]
+      },
+      {
+        "title": "110 El hockey y el lacrosse (Hockey and lacrosse)",
+        "sections": [
+          {
+            "title": "El hockey sobre hielo (Ice hockey)",
+            "count": 41
+          },
+          {
+            "title": "El hockey sobre hierba (Field hockey)",
+            "count": 6
+          },
+          {
+            "title": "El lacrosse (Lacrosse)",
+            "count": 9
+          }
+        ]
+      },
+      {
+        "title": "111 El críquet (Cricket)",
+        "sections": [
+          {
+            "title": "El campo de críquet y las posiciones (Cricket pitch and positions)",
+            "count": 24
+          },
+          {
+            "title": "El equipo de críquet (Cricket equipment)",
+            "count": 13
+          },
+          {
+            "title": "Los verbos de críquet (Cricket verbs)",
+            "count": 7
+          }
+        ]
+      },
+      {
+        "title": "112 El baloncesto y el voleibol (Basketball and volleyball)",
+        "sections": [
+          {
+            "title": "El baloncesto (Basketball)",
+            "count": 41
+          },
+          {
+            "title": "El voleibol (Volleyball)",
+            "count": 15
+          }
+        ]
+      },
+      {
+        "title": "113 El béisbol (Baseball)",
+        "sections": [
+          {
+            "title": "El partido de béisbol (Baseball game)",
+            "count": 49
+          }
+        ]
+      },
+      {
+        "title": "114 El tenis (Tennis)",
+        "sections": [
+          {
+            "title": "El partido de tenis (Tennis match)",
+            "count": 44
+          },
+          {
+            "title": "Los juegos de raqueta (Racket games)",
+            "count": 7
+          }
+        ]
+      },
+      {
+        "title": "115 El golf (Golf)",
+        "sections": [
+          {
+            "title": "En el campo de golf (On the golf course)",
+            "count": 26
+          },
+          {
+            "title": "El equipo de golf (Golf equipment)",
+            "count": 11
+          },
+          {
+            "title": "Los paLos de golf (Golf clubs)",
+            "count": 13
+          },
+          {
+            "title": "Los verbos de golf (Golf verbs)",
+            "count": 7
+          }
+        ]
+      },
+      {
+        "title": "116 El atletismo (Athletics)",
+        "sections": [
+          {
+            "title": "La pista de atletismo (Athletics track)",
+            "count": 8
+          },
+          {
+            "title": "Las carreras (Racing events)",
+            "count": 10
+          },
+          {
+            "title": "Las pruebas de atletismo (Field events)",
+            "count": 12
+          },
+          {
+            "title": "En el podio (On the podium)",
+            "count": 6
+          },
+          {
+            "title": "Las pruebas combinadas (Combined events)",
+            "count": 5
+          }
+        ]
+      },
+      {
+        "title": "117 Los deportes de combate (Combat sports)",
+        "sections": [
+          {
+            "title": "Las artes marciales (Martial arts)",
+            "count": 26
+          },
+          {
+            "title": "Las acciones (Actions)",
+            "count": 12
+          },
+          {
+            "title": "El boxeo (Boxing)",
+            "count": 9
+          },
+          {
+            "title": "La esgrima (Fencing)",
+            "count": 8
+          }
+        ]
+      },
+      {
+        "title": "118 La natación (Swimming)",
+        "sections": [
+          {
+            "title": "La natación (Swimming)",
+            "count": 33
+          },
+          {
+            "title": "El salto (Diving)",
+            "count": 13
+          },
+          {
+            "title": "El buceo (Underwater diving)",
+            "count": 15
+          }
+        ]
+      },
+      {
+        "title": "119 La navegación y los deportes acuáticos (Sailing and watersports)",
+        "sections": [
+          {
+            "title": "La navegación (Sailing)",
+            "count": 32
+          },
+          {
+            "title": "Los deportes acuáticos (Watersports)",
+            "count": 34
+          }
+        ]
+      },
+      {
+        "title": "120 La equitación (Horse riding)",
+        "sections": [
+          {
+            "title": "La equitación (Horseback riding (US) / Horseriding (UK))",
+            "count": 46
+          },
+          {
+            "title": "Los verbos (Verbs)",
+            "count": 9
+          }
+        ]
+      },
+      {
+        "title": "121 La pesca (Fishing)",
+        "sections": [
+          {
+            "title": "El pescador de caña (Angler)",
+            "count": 13
+          },
+          {
+            "title": "La pesca (Fishing)",
+            "count": 15
+          },
+          {
+            "title": "Los tipos de pesca (Types of fishing)",
+            "count": 10
+          },
+          {
+            "title": "Los verbos de pesca (Fishing verbs)",
+            "count": 8
+          },
+          {
+            "title": "Los nudos (Knots)",
+            "count": 7
+          }
+        ]
+      },
+      {
+        "title": "122 Los deportes de invierno (Winter sports)",
+        "sections": [
+          {
+            "title": "El esquí (Skiing)",
+            "count": 28
+          },
+          {
+            "title": "Otros deportes de invierno (Other winter sports)",
+            "count": 26
+          }
+        ]
+      },
+      {
+        "title": "123 Los deportes de motor (Motorsports)",
+        "sections": [
+          {
+            "title": "El coche de carreras (Race car (US) / Racing Car (UK))",
+            "count": 17
+          },
+          {
+            "title": "Los tipos de deportes de motor (Types of motorsports)",
+            "count": 9
+          },
+          {
+            "title": "El circuito de carreras (Race track)",
+            "count": 12
+          }
+        ]
+      },
+      {
+        "title": "124 En el gimnasio (At the gym)",
+        "sections": [
+          {
+            "title": "Los entrenamientos (Working out)",
+            "count": 59
+          }
+        ]
+      },
+      {
+        "title": "125 Otros deportes (Other sports)",
+        "sections": [
+          {
+            "title": "La gimnasia (Gymnastics)",
+            "count": 12
+          },
+          {
+            "title": "Otros deportes (Other sports)",
+            "count": 39
+          },
+          {
+            "title": "Los deportes adaptados (Parasports)",
+            "count": 9
+          }
+        ]
+      },
+      {
+        "title": "126 Sobre el escenario (On stage)",
+        "sections": [
+          {
+            "title": "El teatro (Theater (US) / Theatre (UK))",
+            "count": 34
+          },
+          {
+            "title": "El ballet (Ballet)",
+            "count": 14
+          },
+          {
+            "title": "La ópera (Opera)",
+            "count": 10
+          }
+        ]
+      },
+      {
+        "title": "127 Las películas (Movies (US) / Films (UK))",
+        "sections": [
+          {
+            "title": "En el cine (At the movies (US) / At the cinema (UK))",
+            "count": 26
+          },
+          {
+            "title": "El estudio de cine (Film studio)",
+            "count": 22
+          }
+        ]
+      },
+      {
+        "title": "128 La música (Music)",
+        "sections": [
+          {
+            "title": "Los instrumentos de orquesta (Orchestral instruments)",
+            "count": 48
+          },
+          {
+            "title": "La partitura, las notas y las notaciones (Score, notes, and notation)",
+            "count": 13
+          }
+        ]
+      },
+      {
+        "title": "129 La música (continuación) (Music continued)",
+        "sections": [
+          {
+            "title": "La música popular (Popular music)",
+            "count": 39
+          },
+          {
+            "title": "Más instrumentos (More instruments)",
+            "count": 36
+          }
+        ]
+      },
+      {
+        "title": "130 Los museos y las galerías (Museums and galleries)",
+        "sections": [
+          {
+            "title": "En el museo y la galería de arte (At the museum and art gallery)",
+            "count": 44
+          }
+        ]
+      },
+      {
+        "title": "131 El viaje y el alojamiento (Travel and accommodation)",
+        "sections": [
+          {
+            "title": "El viaje (Travel)",
+            "count": 16
+          },
+          {
+            "title": "El alojamiento (Accommodation)",
+            "count": 29
+          },
+          {
+            "title": "Los servicios (Services)",
+            "count": 10
+          }
+        ]
+      },
+      {
+        "title": "132 La visita turística (Sightseeing)",
+        "sections": [
+          {
+            "title": "La atracción turística (Tourist attraction)",
+            "count": 20
+          },
+          {
+            "title": "Las atracciones (Attractions)",
+            "count": 18
+          }
+        ]
+      },
+      {
+        "title": "133 Las actividades al aire libre (Outdoor activities)",
+        "sections": [
+          {
+            "title": "Las actividades al aire libre (Open-air activities)",
+            "count": 43
+          }
+        ]
+      },
+      {
+        "title": "134 En la playa (On the beach)",
+        "sections": [
+          {
+            "title": "En la playa (On the beach)",
+            "count": 53
+          }
+        ]
+      },
+      {
+        "title": "135 La acampada (Camping)",
+        "sections": [
+          {
+            "title": "El equipo de camping y las instalaciones (Camping equipment and facilities)",
+            "count": 43
+          },
+          {
+            "title": "El campamento (Campground (US) / Campsite (UK))",
+            "count": 14
+          }
+        ]
+      },
+      {
+        "title": "136 El ocio en el hogar (Home entertainment)",
+        "sections": [
+          {
+            "title": "La televisión y el audio (Television and audio)",
+            "count": 44
+          },
+          {
+            "title": "Los videojuegos (Video games)",
+            "count": 14
+          }
+        ]
+      },
+      {
+        "title": "137 La televisión (Television)",
+        "sections": [
+          {
+            "title": "Viendo la televisión (Watching television)",
+            "count": 23
+          },
+          {
+            "title": "Los verbos de la televisión (Television verbs)",
+            "count": 13
+          },
+          {
+            "title": "Los programas de tv y los canales (TV shows and channels)",
+            "count": 25
+          }
+        ]
+      },
+      {
+        "title": "138 Los libros y la lectura (Books and reading)",
+        "sections": [
+          {
+            "title": "Los libros (Books)",
+            "count": 22
+          },
+          {
+            "title": "La lectura y los géneros (Reading and genres)",
+            "count": 35
+          }
+        ]
+      },
+      {
+        "title": "139 La fantasía y los mitos (Fantasy and myth)",
+        "sections": [
+          {
+            "title": "Los mitos, las historias y las criaturas fantásticas (Myths, stories, and fantastic creatures)",
+            "count": 60
+          }
+        ]
+      },
+      {
+        "title": "140 Los juegos (Games)",
+        "sections": [
+          {
+            "title": "El ajedrez (Chess)",
+            "count": 13
+          },
+          {
+            "title": "Jugando a las cartas (Playing cards)",
+            "count": 16
+          },
+          {
+            "title": "Los juegos (Games)",
+            "count": 25
+          }
+        ]
+      },
+      {
+        "title": "141 Las manualidades (Arts and crafts)",
+        "sections": [
+          {
+            "title": "La pintura (Painting)",
+            "count": 29
+          },
+          {
+            "title": "Otras artes y manualidades (Other arts and crafts)",
+            "count": 29
+          }
+        ]
+      },
+      {
+        "title": "142 Las manualidades (continuación) (Arts and crafts continued)",
+        "sections": [
+          {
+            "title": "La costura (Sewing)",
+            "count": 70
+          }
+        ]
+      },
+      {
+        "title": "143 El espacio (Space)",
+        "sections": [
+          {
+            "title": "El sistema solar (The solar system)",
+            "count": 29
+          },
+          {
+            "title": "La exploración espacial (Space exploration)",
+            "count": 25
+          }
+        ]
+      },
+      {
+        "title": "144 El espacio (continuación) (Space continued)",
+        "sections": [
+          {
+            "title": "La astronomía (Astronomy)",
+            "count": 16
+          },
+          {
+            "title": "Las estrellas y constelaciones (Stars and constellations)",
+            "count": 24
+          },
+          {
+            "title": "El zodíaco (The zodiac)",
+            "count": 15
+          }
+        ]
+      },
+      {
+        "title": "145 El planeta Tierra (Planet Earth)",
+        "sections": [
+          {
+            "title": "La tierra (The Earth)",
+            "count": 26
+          },
+          {
+            "title": "Las placas tectónicas (Plate tectonics)",
+            "count": 15
+          },
+          {
+            "title": "Los accidentes y fenómenos hidrológicos (Water features and phenomena)",
+            "count": 13
+          }
+        ]
+      },
+      {
+        "title": "146 La geografía (Geography)",
+        "sections": [
+          {
+            "title": "Las características geográficas y el paisaje (Geographical features and landscape)",
+            "count": 37
+          },
+          {
+            "title": "Las cuevas y la espeleología (Caves and caving)",
+            "count": 10
+          }
+        ]
+      },
+      {
+        "title": "147 La geografía (continuación) (Geography continued)",
+        "sections": [
+          {
+            "title": "Los accidentes costeros (Coastal features)",
+            "count": 29
+          },
+          {
+            "title": "Las características del río (River features)",
+            "count": 13
+          }
+        ]
+      },
+      {
+        "title": "148 Los mapas y las indicaciones (Maps and directions)",
+        "sections": [
+          {
+            "title": "Leyendo el mapa (Reading a map)",
+            "count": 43
+          },
+          {
+            "title": "Las preposiciones de lugar (Prepositions of place)",
+            "count": 9
+          },
+          {
+            "title": "Los verbos de dirección (Direction verbs)",
+            "count": 13
+          }
+        ]
+      },
+      {
+        "title": "149 Los países (Countries)",
+        "sections": [
+          {
+            "title": "África (Africa)",
+            "count": 55
+          },
+          {
+            "title": "Sudamérica (South America)",
+            "count": 13
+          }
+        ]
+      },
+      {
+        "title": "150 Los países (continuación) (Countries continued)",
+        "sections": [
+          {
+            "title": "América del Norte, América Central y el Caribe (North and Central America and the Caribbean)",
+            "count": 24
+          },
+          {
+            "title": "Oceanía (Oceania)",
+            "count": 15
+          },
+          {
+            "title": "Asia (Asia)",
+            "count": 28
+          }
+        ]
+      },
+      {
+        "title": "151 Los países (continuación) (Countries continued)",
+        "sections": [
+          {
+            "title": "Asia (continuación) (Asia)",
+            "count": 21
+          },
+          {
+            "title": "Europa (Europe)",
+            "count": 47
+          }
+        ]
+      },
+      {
+        "title": "152 Las nacionalidades (Nationalities)",
+        "sections": [
+          {
+            "title": "África (Africa)",
+            "count": 56
+          },
+          {
+            "title": "Sudamérica (South America)",
+            "count": 14
+          },
+          {
+            "title": "América del Norte, América Central y el Caribe (North America, Central America and the Caribbean)",
+            "count": 25
+          }
+        ]
+      },
+      {
+        "title": "153 Las nacionalidades (continuación) (Nationalities continued)",
+        "sections": [
+          {
+            "title": "Oceanía (Oceania)",
+            "count": 16
+          },
+          {
+            "title": "Asia (Asia)",
+            "count": 49
+          },
+          {
+            "title": "Europa (Europe)",
+            "count": 47
+          }
+        ]
+      },
+      {
+        "title": "154 El tiempo (Weather)",
+        "sections": [
+          {
+            "title": "El tiempo (Weather)",
+            "count": 29
+          },
+          {
+            "title": "La temperatura (Temperature)",
+            "count": 17
+          },
+          {
+            "title": "Los adjetivos del tiempo (Weather adjectives)",
+            "count": 13
+          }
+        ]
+      },
+      {
+        "title": "155 El clima y el medio ambiente (Climate and the environment)",
+        "sections": [
+          {
+            "title": "La atmósfera (Atmosphere)",
+            "count": 18
+          },
+          {
+            "title": "Los problemas medioambientales (Environmental issues)",
+            "count": 10
+          },
+          {
+            "title": "El cambio climático (Climate change)",
+            "count": 17
+          },
+          {
+            "title": "Los residuos y el reciclaje (Waste and recycling)",
+            "count": 10
+          }
+        ]
+      },
+      {
+        "title": "156 Las rocas y los minerales (Rocks and minerals)",
+        "sections": [
+          {
+            "title": "Las rocas (Rocks)",
+            "count": 19
+          },
+          {
+            "title": "Los minerales (Minerals)",
+            "count": 13
+          },
+          {
+            "title": "Las gemas (Gems)",
+            "count": 19
+          },
+          {
+            "title": "Los metales (Metals)",
+            "count": 13
+          }
+        ]
+      },
+      {
+        "title": "157 La historia natural (Natural history)",
+        "sections": [
+          {
+            "title": "Los períodos geológicos (Eras)",
+            "count": 47
+          }
+        ]
+      },
+      {
+        "title": "158 Los mamíferos (Mammals)",
+        "sections": [
+          {
+            "title": "Las especies de mamíferos (Species of mammals)",
+            "count": 57
+          }
+        ]
+      },
+      {
+        "title": "159 Los mamíferos (continuación) (Mammals continued)",
+        "sections": [
+          {
+            "title": "Las especies de mamíferos (Species of mammals)",
+            "count": 69
+          }
+        ]
+      },
+      {
+        "title": "160 Las aves (Birds)",
+        "sections": [
+          {
+            "title": "Las especies de aves (Species of birds)",
+            "count": 63
+          }
+        ]
+      },
+      {
+        "title": "161 Las aves (continuación) (Birds continued)",
+        "sections": [
+          {
+            "title": "Las especies de aves (Species of birds)",
+            "count": 48
+          },
+          {
+            "title": "Los verbos (Verbs)",
+            "count": 6
+          }
+        ]
+      },
+      {
+        "title": "162 Los insectos y los bichos (Insects and bugs)",
+        "sections": [
+          {
+            "title": "Las mariposas y las polillas (Butterflies and moths)",
+            "count": 22
+          },
+          {
+            "title": "Otros bichos e invertebrados (Other bugs and invertebrates)",
+            "count": 36
+          }
+        ]
+      },
+      {
+        "title": "163 Los anfibios y los reptiles (Amphibians and reptiles)",
+        "sections": [
+          {
+            "title": "Los anfibios (Amphibians)",
+            "count": 17
+          },
+          {
+            "title": "Los reptiles (Reptiles)",
+            "count": 36
+          }
+        ]
+      },
+      {
+        "title": "164 Las mascotas (Pets)",
+        "sections": [
+          {
+            "title": "Las razas de gato (Cat breeds)",
+            "count": 21
+          },
+          {
+            "title": "Las razas de perro (Dog breeds)",
+            "count": 24
+          },
+          {
+            "title": "Otras mascotas (Other pets)",
+            "count": 15
+          },
+          {
+            "title": "Los productos para mascotas (Pet supplies)",
+            "count": 12
+          }
+        ]
+      },
+      {
+        "title": "165 Los animales de granja (Farm animals)",
+        "sections": [
+          {
+            "title": "En la granja (On the farm)",
+            "count": 46
+          }
+        ]
+      },
+      {
+        "title": "166 La vida oceánica (Ocean life)",
+        "sections": [
+          {
+            "title": "Las especies marinas (Marine species)",
+            "count": 49
+          },
+          {
+            "title": "El arrecife de coral (Coral reef)",
+            "count": 20
+          }
+        ]
+      },
+      {
+        "title": "167 Las plantas y los árboles (Plants and trees)",
+        "sections": [
+          {
+            "title": "Las plantas y los árboles (Plants and trees)",
+            "count": 48
+          }
+        ]
+      },
+      {
+        "title": "168 Las plantas y los árboles (continuación) (Plants and trees continued)",
+        "sections": [
+          {
+            "title": "Las plantas y los árboles (Plants and trees)",
+            "count": 51
+          }
+        ]
+      },
+      {
+        "title": "169 Las plantas y los árboles (continuación) (Plants and trees continued)",
+        "sections": [
+          {
+            "title": "Las plantas y los árboles (Plants and trees)",
+            "count": 51
+          }
+        ]
+      },
+      {
+        "title": "170 Los hongos (Fungi)",
+        "sections": [
+          {
+            "title": "Las especies de hongos (Species of fungi)",
+            "count": 42
+          }
+        ]
+      },
+      {
+        "title": "171 El tiempo (Time)",
+        "sections": [
+          {
+            "title": "Dar la hora (Telling the time)",
+            "count": 38
+          },
+          {
+            "title": "Las partes del día (Parts of the day)",
+            "count": 12
+          }
+        ]
+      },
+      {
+        "title": "172 El calendario (The calendar)",
+        "sections": [
+          {
+            "title": "El calendario y las estaciones (Calendar and seasons)",
+            "count": 54
+          }
+        ]
+      },
+      {
+        "title": "173 Los números (Numbers)",
+        "sections": [
+          {
+            "title": "Los números cardinales (Cardinal numbers)",
+            "count": 32
+          },
+          {
+            "title": "Los números ordinales (Ordinal numbers)",
+            "count": 13
+          },
+          {
+            "title": "Los números grandes (Large numbers)",
+            "count": 18
+          },
+          {
+            "title": "Las fracciones, los decimales y los porcentajes (Fractions, decimals and percentages)",
+            "count": 13
+          }
+        ]
+      },
+      {
+        "title": "174 Los pesos y las medidas (Weights and measures)",
+        "sections": [
+          {
+            "title": "El peso (Weight)",
+            "count": 10
+          },
+          {
+            "title": "La distancia, el área y la longitud (Distance, area, and length)",
+            "count": 18
+          },
+          {
+            "title": "Las medidas de capacidad y volumen (Liquid measurements / volume)",
+            "count": 13
+          }
+        ]
+      },
+      {
+        "title": "175 La escritura (Writing)",
+        "sections": [
+          {
+            "title": "La escritura y los materiales de escritura (Writing and writing equipment)",
+            "count": 56
+          }
+        ]
+      },
+      {
+        "title": "176 Describiendo las cosas (Describing things)",
+        "sections": [
+          {
+            "title": "Los materiales (Materials)",
+            "count": 27
+          },
+          {
+            "title": "Los adjetivos (Adjectives)",
+            "count": 35
+          }
+        ]
+      },
+      {
+        "title": "177 Describiendo las cosas (continuación) (Describing things continued)",
+        "sections": [
+          {
+            "title": "Las opiniones (Opinions)",
+            "count": 60
+          }
+        ]
+      },
+      {
+        "title": "178 Los verbos compuestos comunes (Common phrasal verbs)",
+        "sections": [
+          {
+            "title": "Los verbos de la vida cotidiana (Verbs for daily life)",
+            "count": 67
+          }
+        ]
+      },
+      {
+        "title": "179 Las expresiones útiles (Useful expressions)",
+        "sections": [
+          {
+            "title": "Los saludos (Greetings)",
+            "count": 16
+          },
+          {
+            "title": "Conociendo a alguien (Getting to know someone)",
+            "count": 13
+          },
+          {
+            "title": "Comprando (Shopping)",
+            "count": 10
+          }
+        ]
+      },
+      {
+        "title": "180 Las expresiones útiles (continuación) (Useful expressions continued)",
+        "sections": [
+          {
+            "title": "Las direcciones (Directions)",
+            "count": 13
+          },
+          {
+            "title": "Las preposiciones (Prepositions)",
+            "count": 13
+          }
+        ]
+      }
+    ]
+  },
+  "usborne-ftw-es": {
+    "id": "usborne-ftw-es",
+    "title": "First Thousand Words in Spanish",
+    "source": {
+      "name": "Usborne Quicklinks",
+      "url": "https://usborne.com/gb/quicklinks/quicklink/first-thousand-words-in-spanish"
+    },
+    "chapters": [
+      {
+        "title": "4-5 La casa (At home)",
+        "sections": [
+          {
+            "title": "El cuarto de baño (Bathroom)",
+            "count": 15
+          },
+          {
+            "title": "El cuarto de estar (Living room)",
+            "count": 9
+          },
+          {
+            "title": "El vestíbulo (Hall)",
+            "count": 7
+          },
+          {
+            "title": "El dormitorio (Bedroom)",
+            "count": 14
+          }
+        ]
+      },
+      {
+        "title": "6-7 La cocina (The kitchen)",
+        "sections": [
+          {
+            "count": 39
+          }
+        ]
+      },
+      {
+        "title": "8-9 El jardín (The garden)",
+        "sections": [
+          {
+            "count": 37
+          }
+        ]
+      },
+      {
+        "title": "10-11 El taller (The workshop)",
+        "sections": [
+          {
+            "count": 31
+          }
+        ]
+      },
+      {
+        "title": "12-13 La calle (The street)",
+        "sections": [
+          {
+            "count": 39
+          }
+        ]
+      },
+      {
+        "title": "14-15 La juguetería (The toyshop)",
+        "sections": [
+          {
+            "count": 39
+          }
+        ]
+      },
+      {
+        "title": "16-17 El parque (The park)",
+        "sections": [
+          {
+            "count": 37
+          }
+        ]
+      },
+      {
+        "title": "18-19 Los animales (Animals)",
+        "sections": [
+          {
+            "count": 42
+          }
+        ]
+      },
+      {
+        "title": "20-21 Los viajes (Travel)",
+        "sections": [
+          {
+            "title": "La estación de ferrocarril (Railway station)",
+            "count": 15
+          },
+          {
+            "title": "El garaje (Garage)",
+            "count": 16
+          },
+          {
+            "title": "El aeropuerto (Airport)",
+            "count": 9
+          }
+        ]
+      },
+      {
+        "title": "22-23 El campo (The country)",
+        "sections": [
+          {
+            "count": 35
+          }
+        ]
+      },
+      {
+        "title": "24-25 La granja (The farm)",
+        "sections": [
+          {
+            "count": 41
+          }
+        ]
+      },
+      {
+        "title": "26-27 La playa (The seaside)",
+        "sections": [
+          {
+            "count": 38
+          }
+        ]
+      },
+      {
+        "title": "28-29 La escuela (The school)",
+        "sections": [
+          {
+            "count": 43
+          }
+        ]
+      },
+      {
+        "title": "30-31 El hospital (The hospital)",
+        "sections": [
+          {
+            "count": 20
+          }
+        ]
+      },
+      {
+        "title": "30-31 El médico (The doctor)",
+        "sections": [
+          {
+            "count": 21
+          }
+        ]
+      },
+      {
+        "title": "32-33 La fiesta (The party)",
+        "sections": [
+          {
+            "count": 32
+          }
+        ]
+      },
+      {
+        "title": "34-35 El supermercado (The supermarket)",
+        "sections": [
+          {
+            "count": 39
+          }
+        ]
+      },
+      {
+        "title": "36-37 Los alimentos (Food)",
+        "sections": [
+          {
+            "count": 36
+          }
+        ]
+      },
+      {
+        "title": "38-39 Yo (I, Me)",
+        "sections": [
+          {
+            "count": 29
+          }
+        ]
+      },
+      {
+        "title": "38-39 La ropa (Clothes)",
+        "sections": [
+          {
+            "count": 34
+          }
+        ]
+      },
+      {
+        "title": "40-41 La gente (People)",
+        "sections": [
+          {
+            "count": 29
+          }
+        ]
+      },
+      {
+        "title": "40-41 La familia (The family)",
+        "sections": [
+          {
+            "count": 15
+          }
+        ]
+      },
+      {
+        "title": "42-43 Haciendo cosas (Doing things)",
+        "sections": [
+          {
+            "count": 48
+          }
+        ]
+      },
+      {
+        "title": "44-45 Palabras opuestas (Opposite words)",
+        "sections": [
+          {
+            "count": 51
+          }
+        ]
+      },
+      {
+        "title": "46-47 Los días (Days)",
+        "sections": [
+          {
+            "count": 37
+          }
+        ]
+      },
+      {
+        "title": "48-49 El tiempo (Weather)",
+        "sections": [
+          {
+            "count": 14
+          }
+        ]
+      },
+      {
+        "title": "48-49 Las estaciones (Seasons)",
+        "sections": [
+          {
+            "count": 5
+          }
+        ]
+      },
+      {
+        "title": "48-49 Animales favoritos (Pets)",
+        "sections": [
+          {
+            "count": 20
+          }
+        ]
+      },
+      {
+        "title": "50-51 Los deportes (Sport)",
+        "sections": [
+          {
+            "count": 50
+          }
+        ]
+      },
+      {
+        "title": "52-53 Los colores (Colours)",
+        "sections": [
+          {
+            "count": 12
+          }
+        ]
+      },
+      {
+        "title": "52-53 Las formas (Shapes)",
+        "sections": [
+          {
+            "count": 11
+          }
+        ]
+      },
+      {
+        "title": "52-53 Los números (Numbers)",
+        "sections": [
+          {
+            "count": 21
+          }
+        ]
+      },
+      {
+        "title": "54-55 La feria (The fairground)",
+        "sections": [
+          {
+            "count": 14
+          }
+        ]
+      },
+      {
+        "title": "54-55 El circo (The circus)",
+        "sections": [
+          {
+            "count": 22
+          }
+        ]
+      }
+    ]
+  }
+}
