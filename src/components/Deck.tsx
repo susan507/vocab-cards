@@ -16,6 +16,7 @@ import {
   useTapGesture,
 } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { resolveAudio } from '@/lib/offlineAudio';
 import type { Word } from '@/lib/types';
 import { COLORS } from '@/theme';
 
@@ -34,7 +35,7 @@ export function Deck({ words, onClose }: { words: Word[]; onClose: () => void })
     (i: number) => {
       const uri = words[i]?.audio;
       if (!uri) return;
-      player.replace({ uri });
+      player.replace({ uri: resolveAudio(uri) });
       player.play();
     },
     [player, words],
