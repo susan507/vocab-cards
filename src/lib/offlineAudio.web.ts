@@ -1,9 +1,19 @@
 import type { Book } from './types';
-import type { DownloadProgress } from './offlineAudio';
+import type { DownloadJob, DownloadProgress, OfflineStatus } from './offlineAudio';
 
-export type { DownloadProgress };
+export type { DownloadJob, DownloadProgress, OfflineStatus };
 
 export const resolveAudio = (url: string) => url;
+
+const NONE: OfflineStatus = {
+  chapterCount: 0,
+  downloaded: new Set(),
+  chapter: () => undefined,
+  downloadBook: () => {},
+  downloadChapter: () => {},
+};
+
+export const useOfflineStatus = (_bookId: string) => NONE;
 
 export const isBookDownloaded = (_book: Book) => false;
 
