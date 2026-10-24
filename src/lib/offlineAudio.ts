@@ -2,7 +2,6 @@ import { Directory, File, Paths } from 'expo-file-system';
 import { useMemo, useSyncExternalStore } from 'react';
 import { chapterAudio, getCatalogBook, loadBook } from './books';
 import { loadPersisted, updatePersisted, usePersisted } from './prefs';
-import type { Book } from './types';
 
 const CONCURRENCY = 6;
 const audioDir = new Directory(Paths.document, 'audio');
