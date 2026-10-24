@@ -9,20 +9,20 @@ test('chapterAudio lists every section of one chapter, deduped, in order', () =>
     title: 'B',
     source: { name: '', url: '' },
     chapters: [
-      { title: 'One', sections: [{ words: [{ es: 'a', en: 'a', audio: 'u/1.mp3' }] }] },
+      { title: 'One', sections: [{ words: [{ id: 'a', es: 'a', en: 'a', audio: 'u/1.mp3' }] }] },
       {
         title: 'Two',
         sections: [
           {
             words: [
-              { es: 'b', en: 'b', audio: 'u/2.mp3' },
-              { es: 'c', en: 'c' },
+              { id: 'b', es: 'b', en: 'b', audio: 'u/2.mp3' },
+              { id: 'c', es: 'c', en: 'c' },
             ],
           },
           {
             words: [
-              { es: 'd', en: 'd', audio: 'u/3.mp3' },
-              { es: 'b', en: 'b', audio: 'u/2.mp3' },
+              { id: 'd', es: 'd', en: 'd', audio: 'u/3.mp3' },
+              { id: 'b', es: 'b', en: 'b', audio: 'u/2.mp3' },
             ],
           },
         ],
