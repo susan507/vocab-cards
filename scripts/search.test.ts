@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { searchTopics, topicFromKey, topicKey, topicLabels } from '../src/lib/books.ts';
+import { CATALOG, searchTopics, topicFromKey, topicKey, topicLabels } from '../src/lib/books.ts';
 
 const labels = (q: string) => searchTopics(q).map(t => topicLabels(t).slice(1).join(' › '));
 
@@ -17,4 +17,11 @@ test('topic keys round-trip and stale keys are dropped', () => {
   assert.equal(topicFromKey('usborne-ftw-es/999'), undefined);
   assert.equal(topicFromKey('usborne-ftw-es/1/5'), undefined);
   assert.equal(topicFromKey('gone/0'), undefined);
+});
+
+test('search can be limited to one book', () => {
+  const [book] = CATALOG;
+  const hits = searchTopics('a', [book]);
+  assert.ok(hits.length > 0);
+  assert.ok(hits.every(t => t.book === book));
 });

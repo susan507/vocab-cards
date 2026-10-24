@@ -42,9 +42,7 @@ export function useDeckOrder() {
   return [order, (next: Order) => save('deckOrder', next)] as const;
 }
 
-const STARS_KEY = 'stars';
-
-const parseStars = (raw: string | null | undefined): string[] => {
+const parseKeys = (raw: string | null | undefined): string[] => {
   try {
     const keys: unknown = JSON.parse(raw ?? '[]');
     return Array.isArray(keys) ? keys.filter(k => typeof k === 'string') : [];
@@ -53,22 +51,34 @@ const parseStars = (raw: string | null | undefined): string[] => {
   }
 };
 
-/** Starred topics in the order they were starred. Keys that no longer resolve are dropped. */
-export function useStars() {
-  const raw = usePersisted(STARS_KEY);
+/** Topic keys in the order they were added. Keys that no longer resolve are dropped. */
+function useTopicSet(storageKey: string) {
+  const raw = usePersisted(storageKey);
   return useMemo(() => {
-    const keys = new Set(parseStars(raw));
+    const keys = new Set(parseKeys(raw));
     return {
       topics: [...keys].flatMap(k => topicFromKey(k) ?? []),
       has: (key: string) => keys.has(key),
       toggle: (key: string) => {
-        if (!cache.has(STARS_KEY)) return;
-        const next = parseStars(cache.get(STARS_KEY));
+        if (!cache.has(storageKey)) return;
+        const next = parseKeys(cache.get(storageKey));
         save(
-          STARS_KEY,
+          storageKey,
           JSON.stringify(next.includes(key) ? next.filter(k => k !== key) : [...next, key]),
         );
       },
     };
-  }, [raw]);
+  }, [raw, storageKey]);
+}
+
+export const useStars = () => useTopicSet('stars');
+
+/** Chapters marked as learned. */
+export const useDone = () => useTopicSet('done');
+
+export function useCollapsed(section: string, byDefault = false) {
+  const key = `collapsed/${section}`;
+  const saved = usePersisted(key);
+  const collapsed = saved ? saved === '1' : byDefault;
+  return [collapsed, () => save(key, collapsed ? '0' : '1')] as const;
 }

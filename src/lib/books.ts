@@ -69,12 +69,8 @@ export function topicLabels({ book, chapter, section }: Topic): string[] {
   ];
 }
 
-export function deckPath({ book, chapter, section }: Topic, random: boolean) {
-  const params = [section === undefined ? '' : `section=${section}`, random ? 'order=random' : '']
-    .filter(Boolean)
-    .join('&');
-  return `/${book.id}/${chapter}${params ? `?${params}` : ''}`;
-}
+export const deckPath = ({ book, chapter, section }: Topic) =>
+  `/${book.id}/${chapter}${section === undefined ? '' : `?section=${section}`}`;
 
 const fold = (s: string) =>
   s
