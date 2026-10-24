@@ -1,4 +1,3 @@
-import type { Book } from './types';
 import type { DownloadJob, DownloadProgress, OfflineStatus } from './offlineAudio';
 
 export type { DownloadJob, DownloadProgress, OfflineStatus };
@@ -14,10 +13,3 @@ const NONE: OfflineStatus = {
 };
 
 export const useOfflineStatus = (_bookId: string) => NONE;
-
-export const isBookDownloaded = (_book: Book) => false;
-
-export const downloadBookAudio = async (
-  _book: Book,
-  _onProgress: (p: DownloadProgress) => void,
-): Promise<DownloadProgress> => ({ done: 0, total: 0, failed: 0 });

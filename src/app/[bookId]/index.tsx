@@ -3,6 +3,7 @@ import type { Href } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SearchBox } from '@/components/SearchBox';
+import { DownloadControl } from '@/components/DownloadControl';
 import { StarButton } from '@/components/StarButton';
 import { Tile, TileGrid, TopicTile, tileStyles } from '@/components/Tile';
 import { deckPath, getCatalogBook, searchTopics, topicKey } from '@/lib/books';
@@ -70,12 +71,16 @@ function ChapterTile({ book, chapter: c }: { book: CatalogBook; chapter: number 
           ))}
         </View>
       ) : null}
+      <View style={styles.download}>
+        <DownloadControl bookId={book.id} chapter={c} />
+      </View>
     </Tile>
   );
 }
 
 const styles = StyleSheet.create({
   pressed: { opacity: 0.6 },
+  download: { alignSelf: 'flex-end', marginTop: 8 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
   chip: {
     flexDirection: 'row',

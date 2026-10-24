@@ -10,9 +10,6 @@ const audioDir = new Directory(Paths.document, 'audio');
 // ponytail: keyed by URL basename, so two books sharing a filename would collide.
 const localFile = (url: string) => new File(audioDir, url.split('/').pop() ?? url);
 
-const bookAudio = (book: Book) =>
-  book.chapters.flatMap(c => c.sections.flatMap(s => s.words.flatMap(w => w.audio ?? [])));
-
 /** The one file check at play time: a deleted file just falls back to streaming. */
 export function resolveAudio(url: string): string {
   const file = localFile(url);
@@ -149,23 +146,4 @@ export function useOfflineStatus(bookId: string): OfflineStatus {
       downloadChapter: index => runJob(bookId, String(index), [index]),
     };
   }, [bookId, raw, bookJobs]);
-}
-
-/** @deprecated File-scans the whole book. Use useOfflineStatus. */
-export const isBookDownloaded = (book: Book) => bookAudio(book).every(u => localFile(u).exists);
-
-/** @deprecated Doesn't record chapter state. Use useOfflineStatus().downloadBook. */
-export async function downloadBookAudio(
-  book: Book,
-  onProgress: (p: DownloadProgress) => void,
-): Promise<DownloadProgress> {
-  const urls = bookAudio(book);
-  const progress = { done: 0, total: urls.length, failed: 0 };
-  onProgress({ ...progress });
-  await downloadUrls(urls, (_, ok) => {
-    if (ok) progress.done++;
-    else progress.failed++;
-    onProgress({ ...progress });
-  });
-  return progress;
 }

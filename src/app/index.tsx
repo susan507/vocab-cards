@@ -1,14 +1,13 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import type { Href } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
+import { DownloadControl } from '@/components/DownloadControl';
 import { SearchBox } from '@/components/SearchBox';
 import { Tile, TileGrid, TopicTile, tileStyles } from '@/components/Tile';
-import { CATALOG, loadBook, searchTopics, topicKey } from '@/lib/books';
+import { CATALOG, searchTopics, topicKey } from '@/lib/books';
 import type { Topic } from '@/lib/books';
-import { downloadBookAudio, isBookDownloaded } from '@/lib/offlineAudio';
-import type { DownloadProgress } from '@/lib/offlineAudio';
 import { useCollapsed, useDone, useStars } from '@/lib/prefs';
 import type { CatalogBook } from '@/lib/types';
 import { COLORS } from '@/theme';
@@ -41,7 +40,7 @@ export default function BooksScreen() {
                   title={book.title}
                   detail={`${book.source.name} · ${book.chapters.length} chapters · ${wordCount(book)} words`}
                 >
-                  {Platform.OS !== 'web' ? <OfflineRow book={book} /> : null}
+                  <DownloadControl bookId={book.id} />
                 </Tile>
               ))}
             </TileGrid>
@@ -105,48 +104,7 @@ const TopicTiles = ({ topics }: { topics: Topic[] }) => (
 const wordCount = (book: CatalogBook) =>
   book.chapters.reduce((n, c) => n + c.sections.reduce((m, s) => m + s.count, 0), 0);
 
-function OfflineRow({ book }: { book: CatalogBook }) {
-  const [complete, setComplete] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [progress, setProgress] = useState<DownloadProgress>();
-
-  useEffect(() => {
-    loadBook(book.id)
-      .then(full => setComplete(!!full && isBookDownloaded(full)))
-      .catch(() => {});
-  }, [book.id]);
-
-  const start = async () => {
-    setBusy(true);
-    const full = await loadBook(book.id);
-    const result = full ? await downloadBookAudio(full, setProgress) : undefined;
-    setBusy(false);
-    setComplete(result?.failed === 0);
-  };
-
-  const label = complete
-    ? 'Available offline'
-    : busy && progress
-      ? `Downloading ${progress.done}/${progress.total}`
-      : progress?.failed
-        ? `${progress.failed} failed, tap to retry`
-        : 'Download for offline';
-
-  return (
-    <Pressable
-      accessibilityRole="button"
-      disabled={complete || busy}
-      onPress={start}
-      style={({ pressed }) => [styles.row, pressed && styles.pressed]}
-    >
-      <Text style={styles.label}>{label}</Text>
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
   heading: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start' },
-  row: { marginTop: 12, alignSelf: 'flex-start' },
   pressed: { opacity: 0.6 },
-  label: { color: COLORS.muted, fontSize: 13 },
 });
