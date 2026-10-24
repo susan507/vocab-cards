@@ -228,8 +228,6 @@ export async function signIn(name: string, pin: string) {
   if (error || !data.user || !data.session)
     return `Couldn’t sign in${error ? `: ${error.message}` : ''}.`;
   const profile = { id: data.user.id, name: String(data.user.user_metadata.name ?? name.trim()) };
-  if (created)
-    logError(await supabase.from('profiles').upsert({ id: profile.id, name: profile.name }));
   await loadProfile(profile, created);
   save(PROFILE_KEY, JSON.stringify(profile));
   return null;
