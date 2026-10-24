@@ -1,14 +1,15 @@
-import { router } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import type { Href } from 'expo-router';
-import { Fragment, useEffect, useMemo, useState } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { ListRow } from '@/components/ListRow';
-import { StarButton } from '@/components/StarButton';
-import { CATALOG, deckPath, loadBook, searchTopics, topicKey, topicLabels } from '@/lib/books';
+import { useEffect, useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
+import { Platform, Pressable, ScrollView, StyleSheet, Text } from 'react-native';
+import { SearchBox } from '@/components/SearchBox';
+import { Tile, TileGrid, TopicTile, tileStyles } from '@/components/Tile';
+import { CATALOG, loadBook, searchTopics, topicKey } from '@/lib/books';
 import type { Topic } from '@/lib/books';
 import { downloadBookAudio, isBookDownloaded } from '@/lib/offlineAudio';
 import type { DownloadProgress } from '@/lib/offlineAudio';
-import { useDeckOrder, useStars } from '@/lib/prefs';
+import { useCollapsed, useDone, useStars } from '@/lib/prefs';
 import type { CatalogBook } from '@/lib/types';
 import { COLORS } from '@/theme';
 
@@ -18,66 +19,91 @@ export default function BooksScreen() {
   const [query, setQuery] = useState('');
   const results = useMemo(() => searchTopics(query), [query]);
   const { topics: starred } = useStars();
+  const { topics: learned } = useDone();
 
   return (
-    <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
-      <TextInput
-        value={query}
-        onChangeText={setQuery}
-        placeholder="Search topics"
-        placeholderTextColor={COLORS.muted}
-        autoCorrect={false}
-        autoCapitalize="none"
-        clearButtonMode="while-editing"
-        returnKeyType="search"
-        style={styles.search}
-      />
+    <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={tileStyles.screen}>
+      <SearchBox value={query} onChangeText={setQuery} placeholder="Search topics" />
       {query.trim() ? (
         results.length ? (
-          results.slice(0, MAX_RESULTS).map(t => <TopicRow key={topicKey(t)} topic={t} />)
+          <TopicTiles topics={results.slice(0, MAX_RESULTS)} />
         ) : (
-          <Text style={styles.empty}>No matching topics</Text>
+          <Text style={tileStyles.empty}>No matching topics</Text>
         )
       ) : (
         <>
-          {starred.length ? (
-            <>
-              <Text style={styles.heading}>★ Starred</Text>
-              {starred.map(t => (
-                <TopicRow key={topicKey(t)} topic={t} />
+          <Section id="books" title="Books">
+            <TileGrid>
+              {CATALOG.map(book => (
+                <Tile
+                  key={book.id}
+                  href={`/${book.id}` as Href}
+                  title={book.title}
+                  detail={`${book.source.name} · ${book.chapters.length} chapters · ${wordCount(book)} words`}
+                >
+                  {Platform.OS !== 'web' ? <OfflineRow book={book} /> : null}
+                </Tile>
               ))}
-              <Text style={styles.heading}>Books</Text>
-            </>
+            </TileGrid>
+          </Section>
+          {starred.length ? (
+            <Section id="starred" title="★ Starred">
+              <TopicTiles topics={starred} />
+            </Section>
           ) : null}
-          {CATALOG.map(book => (
-            <Fragment key={book.id}>
-              <ListRow href={`/${book.id}`} title={book.title} subtitle={book.source.name} />
-              {Platform.OS !== 'web' ? <OfflineRow book={book} /> : null}
-            </Fragment>
-          ))}
+          {learned.length ? (
+            <Section id="learned" title="✓ Learned" collapsedByDefault>
+              <TopicTiles topics={learned} />
+            </Section>
+          ) : null}
         </>
       )}
     </ScrollView>
   );
 }
 
-function TopicRow({ topic }: { topic: Topic }) {
-  const [order] = useDeckOrder();
-  const [bookTitle, ...rest] = topicLabels(topic);
+function Section({
+  id,
+  title,
+  collapsedByDefault,
+  children,
+}: {
+  id: string;
+  title: string;
+  collapsedByDefault?: boolean;
+  children: ReactNode;
+}) {
+  const [collapsed, toggle] = useCollapsed(id, collapsedByDefault);
   return (
-    <Pressable
-      accessibilityRole="link"
-      onPress={() => router.push(deckPath(topic, order === 'random') as Href)}
-      style={({ pressed }) => [styles.topic, pressed && styles.pressed]}
-    >
-      <View style={styles.topicText}>
-        <Text style={styles.bookTitle}>{bookTitle} ›</Text>
-        <Text style={styles.topicTitle}>{rest.join(' › ')}</Text>
-      </View>
-      <StarButton topicKey={topicKey(topic)} />
-    </Pressable>
+    <>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ expanded: !collapsed }}
+        onPress={toggle}
+        style={({ pressed }) => [styles.heading, pressed && styles.pressed]}
+      >
+        <Ionicons
+          name={collapsed ? 'chevron-forward' : 'chevron-down'}
+          size={14}
+          color={COLORS.muted}
+        />
+        <Text style={tileStyles.heading}>{title}</Text>
+      </Pressable>
+      {collapsed ? null : children}
+    </>
   );
 }
+
+const TopicTiles = ({ topics }: { topics: Topic[] }) => (
+  <TileGrid>
+    {topics.map(t => (
+      <TopicTile key={topicKey(t)} topic={t} />
+    ))}
+  </TileGrid>
+);
+
+const wordCount = (book: CatalogBook) =>
+  book.chapters.reduce((n, c) => n + c.sections.reduce((m, s) => m + s.count, 0), 0);
 
 function OfflineRow({ book }: { book: CatalogBook }) {
   const [complete, setComplete] = useState(false);
@@ -119,37 +145,8 @@ function OfflineRow({ book }: { book: CatalogBook }) {
 }
 
 const styles = StyleSheet.create({
-  content: { width: '100%', maxWidth: 800, alignSelf: 'center', paddingBottom: 24 },
-  search: {
-    margin: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 10,
-    backgroundColor: COLORS.surface,
-    color: COLORS.text,
-    fontSize: 16,
-  },
-  heading: {
-    color: COLORS.muted,
-    fontSize: 13,
-    fontWeight: '600',
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 4,
-  },
-  empty: { color: COLORS.muted, fontSize: 15, paddingHorizontal: 20 },
-  topic: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 10,
-    paddingLeft: 20,
-    paddingRight: 16,
-  },
-  topicText: { flex: 1 },
-  topicTitle: { color: COLORS.text, fontSize: 16 },
-  row: { paddingTop: 0, paddingBottom: 14, paddingHorizontal: 20 },
+  heading: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start' },
+  row: { marginTop: 12, alignSelf: 'flex-start' },
   pressed: { opacity: 0.6 },
   label: { color: COLORS.muted, fontSize: 13 },
-  bookTitle: { color: COLORS.muted, fontSize: 12, marginBottom: 2 },
 });
