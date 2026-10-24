@@ -27,8 +27,8 @@ Pushing to `main` runs CI: typecheck, test, build, then deploy to GitHub Pages.
 ## Data
 
 ```
-raw/                      captured source data, one file per import
-scripts/import/<source>.ts  turns a raw file into a book JSON
+raw/                      captured source data, for sources that can't be fetched
+scripts/import/<source>.ts  turns source data into a book JSON
 src/data/books/*.json     generated books (committed, bundled into the app)
 src/lib/types.ts          the Book → Chapter → Section → Word format
 src/lib/books.ts          book registry and deck builders
@@ -64,6 +64,12 @@ The Quicklinks page sits behind a Cloudflare check, so it's captured from a real
 3. Run `npm run import:usborne`.
 
 Fixes for source typos live in `FIXES` in `scripts/import/usborne.ts`.
+
+### Importing: DK Illustrated Dictionary (Spanish)
+
+Run `npm run import:dk`. It fetches the Spanish and English `content.json` behind the [DK audio app](https://apps.dk.com/idic/en/audio/es) and joins them by unit and exercise number. Each DK unit becomes a section, and its heading (exercise 0) is also the section's first card. Fixes for misnumbered or blank English entries live in `FIXES` in `scripts/import/dk.ts`.
+
+The output (~2 MB) isn't in `BOOKS` yet: it needs lazy loading first.
 
 ### Adding a new source
 
