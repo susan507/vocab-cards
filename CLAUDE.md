@@ -6,6 +6,7 @@ Spanish flashcards: Expo + Expo Router + TypeScript. Web first (static SPA on Gi
 
 ## Rules
 
+- `APP.md` is the source of truth for what the app does. Read it before changing behaviour; update it in the same change when a feature is added, changed or removed. Keep it high level.
 - The app reads only the `Book` format in `src/lib/types.ts`. Source-specific parsing belongs in `scripts/import/<source>.ts`, never in app code.
 - Keep the source's word and chapter order exactly.
 - Never commit audio (`*.mp3` is gitignored). Web streams `Word.audio` URLs; native will download them on-device.
