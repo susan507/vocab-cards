@@ -61,7 +61,7 @@ test('buildChapter orders newest first, joins words and adds topic links', () =>
   assert.deepEqual(chapter.links, [
     { title: 'Numbers', url: 'https://www.spanishdict.com/guide/numbers' },
   ]);
-  assert.equal(chapter.sections[0].title, 'Unidad 1');
+  assert.equal(chapter.sections[0].title, undefined);
   assert.deepEqual(chapter.sections[0].words, [
     { id: '3', es: 'Cuba', en: 'Cuba', audio: 'https://a/cuba' },
     { id: '2', es: 'ser', en: 'to be' },

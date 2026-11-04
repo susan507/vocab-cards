@@ -90,7 +90,10 @@ export const buildChapter = (
   fixes = FIXES,
 ): Chapter => ({
   title: unit.name,
-  sections: lists.map(l => buildSection(l, fixes)),
+  // A lone list's name just repeats the unit's, so it needs no subtopic title.
+  sections: lists
+    .map(l => buildSection(l, fixes))
+    .map(s => (lists.length > 1 ? s : { words: s.words })),
   ...(unit.articles.length && {
     links: unit.articles.map(a => ({ title: a.title, url: SITE + a.path })),
   }),

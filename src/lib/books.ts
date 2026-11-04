@@ -5,6 +5,7 @@ import catalogJson from '@/data/catalog.json';
 const LOADERS: Record<string, () => Promise<{ default: unknown }>> = {
   'usborne-ftw-es': () => import('@/data/books/usborne-ftw-es.json'),
   'dk-idic-es': () => import('@/data/books/dk-idic-es.json'),
+  'gente-hoy-1': () => import('@/data/books/gente-hoy-1.json'),
 };
 
 const catalog: Catalog = catalogJson;
