@@ -1,8 +1,10 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Deck } from '@/components/Deck';
-import { chapterDeck, getLoadedBook, loadBook } from '@/lib/books';
+import type { SessionDeck } from '@/components/Deck';
+import { bookDeck, chapterDeck, getLoadedBook, loadBook } from '@/lib/books';
+import { chapterSessionIds, reviewSessionIds } from '@/lib/srs';
 import type { Book } from '@/lib/types';
 import { COLORS } from '@/theme';
 
@@ -12,6 +14,8 @@ export default function ChapterDeckScreen() {
     chapter: string;
     section?: string;
   }>();
+  // `/<book>/all` is "Review all": spaced repetition over the whole book.
+  const all = chapter === 'all';
   const [book, setBook] = useState<Book | null | undefined>(() => getLoadedBook(bookId));
   useEffect(() => {
     if (book) return;
@@ -21,8 +25,16 @@ export default function ChapterDeckScreen() {
   }, [book, bookId]);
   const words = useMemo(() => {
     if (!book) return [];
+    if (all) return bookDeck(book);
     return chapterDeck(book, Number(chapter), section === undefined ? undefined : Number(section));
-  }, [book, chapter, section]);
+  }, [book, all, chapter, section]);
+  const sessionDeck = useCallback<SessionDeck>(
+    (progress, newLeft, day) =>
+      all
+        ? reviewSessionIds(words, bookId, progress, newLeft, day)
+        : chapterSessionIds(words, bookId, progress),
+    [all, words, bookId],
+  );
   const close = () => (router.canGoBack() ? router.back() : router.replace(`/${bookId}`));
   if (book === undefined) {
     return (
@@ -31,7 +43,17 @@ export default function ChapterDeckScreen() {
       </View>
     );
   }
-  return <Deck words={words} links={book?.chapters[Number(chapter)]?.links} onClose={close} />;
+  return (
+    <Deck
+      words={words}
+      bookId={bookId}
+      sessionKey={all ? `${bookId}/all` : [bookId, chapter, section].filter(Boolean).join('/')}
+      sessionDeck={sessionDeck}
+      links={all ? undefined : book?.chapters[Number(chapter)]?.links}
+      mode={all ? 'srs' : undefined}
+      onClose={close}
+    />
+  );
 }
 
 const styles = StyleSheet.create({

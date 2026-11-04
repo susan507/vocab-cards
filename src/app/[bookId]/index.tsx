@@ -1,14 +1,24 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import type { Href } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SearchBox } from '@/components/SearchBox';
 import { DownloadControl } from '@/components/DownloadControl';
 import { StarButton } from '@/components/StarButton';
 import { Tile, TileGrid, TopicTile, tileStyles } from '@/components/Tile';
-import { deckPath, getCatalogBook, searchTopics, topicKey } from '@/lib/books';
-import type { CatalogBook } from '@/lib/types';
+import {
+  chapterDeck,
+  deckPath,
+  getCatalogBook,
+  getLoadedBook,
+  loadBook,
+  searchTopics,
+  topicKey,
+} from '@/lib/books';
+import { useProgress } from '@/lib/prefs';
+import { strength, today } from '@/lib/srs';
+import type { Book, CatalogBook } from '@/lib/types';
 import { COLORS } from '@/theme';
 
 export default function ChaptersScreen() {
@@ -16,6 +26,7 @@ export default function ChaptersScreen() {
   const book = getCatalogBook(bookId);
   const [query, setQuery] = useState('');
   const results = useMemo(() => (book ? searchTopics(query, [book]) : []), [book, query]);
+  const strengths = useChapterStrengths(bookId);
 
   if (!book) return null;
 
@@ -25,15 +36,25 @@ export default function ChaptersScreen() {
       <SearchBox value={query} onChangeText={setQuery} placeholder="Search this book" />
       {!query.trim() ? (
         <TileGrid>
+          <Tile
+            href={`/${book.id}/all` as Href}
+            title="Review all"
+            detail="Spaced repetition over every word in the book"
+          />
           {book.chapters.map((_, c) => (
-            <ChapterTile key={c} book={book} chapter={c} />
+            <ChapterTile key={c} book={book} chapter={c} strength={strengths?.[c]} />
           ))}
         </TileGrid>
       ) : results.length ? (
         <TileGrid>
           {results.map(t =>
             t.section === undefined ? (
-              <ChapterTile key={topicKey(t)} book={book} chapter={t.chapter} />
+              <ChapterTile
+                key={topicKey(t)}
+                book={book}
+                chapter={t.chapter}
+                strength={strengths?.[t.chapter]}
+              />
             ) : (
               <TopicTile key={topicKey(t)} topic={t} inBook />
             ),
@@ -46,7 +67,30 @@ export default function ChaptersScreen() {
   );
 }
 
-function ChapterTile({ book, chapter: c }: { book: CatalogBook; chapter: number }) {
+/** Per chapter, how well its studied words are remembered right now (0–1), once any are studied. */
+function useChapterStrengths(bookId: string) {
+  const [progress] = useProgress(bookId);
+  const studied = !!progress && Object.keys(progress).length > 0;
+  const [book, setBook] = useState<Book | undefined>(() => getLoadedBook(bookId));
+  useEffect(() => {
+    if (studied && !book) loadBook(bookId).then(setBook, () => {});
+  }, [studied, book, bookId]);
+  return useMemo(() => {
+    if (!book || !progress || !studied) return undefined;
+    const day = today();
+    return book.chapters.map((_, c) => strength(chapterDeck(book, c), bookId, progress, day));
+  }, [book, progress, studied, bookId]);
+}
+
+function ChapterTile({
+  book,
+  chapter: c,
+  strength,
+}: {
+  book: CatalogBook;
+  chapter: number;
+  strength?: number;
+}) {
   const chapter = book.chapters[c];
   const key = topicKey({ book, chapter: c });
   return (
@@ -72,6 +116,15 @@ function ChapterTile({ book, chapter: c }: { book: CatalogBook; chapter: number 
           ))}
         </View>
       ) : null}
+      {strength === undefined ? null : (
+        <View
+          style={styles.bar}
+          accessibilityLabel="How well you remember this chapter"
+          accessibilityValue={{ min: 0, max: 100, now: Math.round(strength * 100) }}
+        >
+          <View style={[styles.barFill, { width: `${strength * 100}%` }]} />
+        </View>
+      )}
       <View style={styles.footer}>
         {chapter.links?.length ? (
           <Ionicons
@@ -89,6 +142,14 @@ function ChapterTile({ book, chapter: c }: { book: CatalogBook; chapter: number 
 
 const styles = StyleSheet.create({
   pressed: { opacity: 0.6 },
+  bar: {
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: COLORS.background,
+    overflow: 'hidden',
+    marginTop: 12,
+  },
+  barFill: { height: '100%', backgroundColor: COLORS.muted },
   footer: {
     flexDirection: 'row',
     alignItems: 'center',

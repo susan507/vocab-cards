@@ -27,7 +27,8 @@ export default function ProfileScreen() {
     return (
       <View style={[tileStyles.screen, styles.form]}>
         <Text style={styles.text}>
-          Signed in as {profile.name}. Your stars and learned topics sync across devices.
+          Signed in as {profile.name}. Your stars, learned topics and word progress sync across
+          devices.
         </Text>
         <Button
           label="Sign out"
@@ -42,8 +43,8 @@ export default function ProfileScreen() {
   return (
     <View style={[tileStyles.screen, styles.form]}>
       <Text style={styles.text}>
-        Sign in to keep your own stars and learned topics on every device. A new name creates a
-        profile.
+        Sign in to keep your own stars, learned topics and word progress on every device. A new name
+        creates a profile.
       </Text>
       <TextInput
         value={name}
