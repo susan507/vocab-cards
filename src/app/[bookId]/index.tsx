@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import type { Href } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -71,7 +72,15 @@ function ChapterTile({ book, chapter: c }: { book: CatalogBook; chapter: number 
           ))}
         </View>
       ) : null}
-      <View style={styles.download}>
+      <View style={styles.footer}>
+        {chapter.links?.length ? (
+          <Ionicons
+            name="link"
+            size={18}
+            color={COLORS.muted}
+            accessibilityLabel="Has extra material"
+          />
+        ) : null}
         <DownloadControl bookId={book.id} chapter={c} />
       </View>
     </Tile>
@@ -80,7 +89,13 @@ function ChapterTile({ book, chapter: c }: { book: CatalogBook; chapter: number 
 
 const styles = StyleSheet.create({
   pressed: { opacity: 0.6 },
-  download: { alignSelf: 'flex-end', marginTop: 8 },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-end',
+    gap: 8,
+    marginTop: 8,
+  },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
   chip: {
     flexDirection: 'row',

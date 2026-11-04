@@ -3,6 +3,7 @@ import type { DownloadJob, DownloadProgress, OfflineStatus } from './offlineAudi
 export type { DownloadJob, DownloadProgress, OfflineStatus };
 
 export const resolveAudio = (url: string) => url;
+export const resolveImage = (url: string) => url;
 
 const NONE: OfflineStatus = {
   chapterCount: 0,

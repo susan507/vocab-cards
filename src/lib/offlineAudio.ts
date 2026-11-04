@@ -1,27 +1,29 @@
 import { Directory, File, Paths } from 'expo-file-system';
 import { useMemo, useSyncExternalStore } from 'react';
-import { chapterAudio, getCatalogBook, loadBook } from './books';
+import { chapterMedia, getCatalogBook, loadBook, mediaFileName } from './books';
 import { loadPersisted, updatePersisted, usePersisted } from './prefs';
 
 const CONCURRENCY = 6;
 const audioDir = new Directory(Paths.document, 'audio');
+const imageDir = new Directory(Paths.document, 'images');
 
-// ponytail: keyed by URL basename, so two books sharing a filename would collide.
-const localFile = (url: string) => new File(audioDir, url.split('/').pop() ?? url);
+const localFile = {
+  // ponytail: audio stays keyed by URL basename so existing downloads still resolve; two books sharing a filename would collide.
+  audio: (url: string) => new File(audioDir, url.split('/').pop() ?? url),
+  image: (url: string) => new File(imageDir, mediaFileName(url)),
+};
 
-/** The one file check at play time: a deleted file just falls back to streaming. */
-export function resolveAudio(url: string): string {
-  const file = localFile(url);
-  return file.exists ? file.uri : url;
-}
+/** The one file check at use time: a missing file just falls back to the URL. */
+const resolve = (file: File, url: string) => (file.exists ? file.uri : url);
+export const resolveAudio = (url: string) => resolve(localFile.audio(url), url);
+export const resolveImage = (url: string) => resolve(localFile.image(url), url);
 
 const inflight = new Map<string, Promise<boolean>>();
 
 /** Shared across jobs so a book and a chapter download never fetch the same file twice. */
-function fetchOnce(url: string): Promise<boolean> {
+function fetchOnce(url: string, file: File): Promise<boolean> {
   const pending = inflight.get(url);
   if (pending) return pending;
-  const file = localFile(url);
   if (file.exists) return Promise.resolve(true);
   const p = File.downloadFileAsync(url, file, { idempotent: true })
     .then(
@@ -37,11 +39,12 @@ function fetchOnce(url: string): Promise<boolean> {
 }
 
 /** Skips files already on disk, so re-running retries only the failures. */
-async function downloadUrls(urls: string[], onDone: (url: string, ok: boolean) => void) {
-  audioDir.create({ idempotent: true, intermediates: true });
-  const queue = [...urls];
+async function downloadFiles(files: Map<string, File>, onDone: (url: string, ok: boolean) => void) {
+  for (const dir of [audioDir, imageDir]) dir.create({ idempotent: true, intermediates: true });
+  const queue = [...files];
   const worker = async () => {
-    for (let url = queue.shift(); url; url = queue.shift()) onDone(url, await fetchOnce(url));
+    for (let next = queue.shift(); next; next = queue.shift())
+      onDone(next[0], await fetchOnce(...next));
   };
   await Promise.all(Array.from({ length: CONCURRENCY }, worker));
 }
@@ -91,16 +94,22 @@ async function runJob(bookId: string, key: string, chapters: number[]) {
     const saved = parseChapters(raw);
     const remaining = new Map<number, number>();
     const chaptersOf = new Map<string, number[]>();
+    const files = new Map<string, File>();
     for (const c of chapters) {
       if (saved.has(c)) continue;
-      const urls = chapterAudio(book, c);
-      remaining.set(c, urls.length);
-      if (!urls.length) markDownloaded(bookId, c);
-      for (const u of urls) chaptersOf.set(u, [...(chaptersOf.get(u) ?? []), c]);
+      const media = (['audio', 'image'] as const).flatMap(kind =>
+        chapterMedia(book, c, kind).map(url => [url, localFile[kind](url)] as const),
+      );
+      remaining.set(c, media.length);
+      if (!media.length) markDownloaded(bookId, c);
+      for (const [url, file] of media) {
+        files.set(url, file);
+        chaptersOf.set(url, [...(chaptersOf.get(url) ?? []), c]);
+      }
     }
-    progress.total = chaptersOf.size;
+    progress.total = files.size;
     setJob(bookId, key, { ...progress, running: true });
-    await downloadUrls([...chaptersOf.keys()], (url, ok) => {
+    await downloadFiles(files, (url, ok) => {
       if (ok) progress.done++;
       else progress.failed++;
       for (const c of ok ? (chaptersOf.get(url) ?? []) : []) {
