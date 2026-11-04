@@ -8,20 +8,21 @@ The source of truth for how the app behaves. Keep it short and high level; updat
 - A book has chapters, a chapter may have subtopics, in the same order as the source.
 - Each word has Spanish, English, and audio and a picture when the source has them.
 - A chapter can link to extra material on the source website, opened in the browser.
+- Private books: a book file (e.g. Gente al día 1, made from a glossary the user owns) can be imported in Settings and removed there. It's never part of the app or website. Signed in, it's saved privately to the profile; as a guest, on the device only. It then shows and works like the built-in books, offline too once loaded.
 
 ## Home and book screens
 
 - Home, top to bottom: search, books, starred, learned. Starred and Learned collapse by tapping their title; Learned starts collapsed.
 - Search matches chapter and subtopic names in English or Spanish; inside a book it only searches that book.
 - Chapters show as tiles, the same on home and in a book: word count, extra-material and download icons on one line. Star a chapter to keep it on home; tick it to mark it learned.
-- Settings (gear on home): new words per day for spaced repetition (default 50), and a colour theme (12 light and dark presets, default Paper) that applies everywhere at once.
+- Settings (gear on home): new words per day for spaced repetition (default 50), imported books, and a colour theme (12 light and dark presets, default Paper) that applies everywhere at once.
 - A book starts with a "Review all" tile: spaced repetition over the whole book.
 
 ## Flashcards
 
 - Full screen, one background colour, nothing scrolls. The prompt language on top, the other below, picture above when there is one.
 - Direction: Spanish → English (default) or English → Spanish, one setting for every chapter and mode, kept per profile.
-- Audio (Spanish) plays once when a word appears; tapping anywhere replays it. Except in English → Spanish spaced repetition, where it waits for the reveal tap.
+- Audio (Spanish) plays once when a word appears; tapping anywhere replays it. Except in English → Spanish spaced repetition, where it waits for the reveal tap. Words without a recording are read out by the device's Spanish text-to-speech.
 - Arrows and an audio icon hint at swiping and tapping; they don't do anything themselves.
 - Top bar: close, mode, direction, word list (jump to any word), extra material links when the chapter has them, position.
 - Modes:

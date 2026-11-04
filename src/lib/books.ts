@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from 'react';
 import type { Book, Catalog, CatalogBook, Word } from './types';
 import catalogJson from '@/data/catalog.json';
 
@@ -10,23 +11,115 @@ const LOADERS: Record<string, () => Promise<{ default: unknown }>> = {
 
 const catalog: Catalog = catalogJson;
 
+/** The bundled books. Screens list `useBooks()`, which adds the ones imported on this device or profile. */
 export const CATALOG: CatalogBook[] = Object.keys(LOADERS).map(id => catalog[id]);
 
-export const getCatalogBook = (id: string): CatalogBook | undefined => catalog[id];
+/** A book's catalog entry: its titles and word counts, without the words. */
+export const catalogEntry = ({ chapters, ...book }: Book): CatalogBook => ({
+  ...book,
+  chapters: chapters.map(c => ({
+    title: c.title,
+    sections: c.sections.map(s => ({ title: s.title, count: s.words.length })),
+    ...(c.links?.length && { links: c.links }),
+  })),
+});
+
+const imported = new Map<string, { book: Book; entry: CatalogBook }>();
+let books = CATALOG;
+const bookListeners = new Set<() => void>();
+let markImportedReady: () => void;
+const importedReady = new Promise<void>(resolve => (markImportedReady = resolve));
+
+/** Replaces the imported (private) books; ids of bundled books are ignored. */
+export function setImportedBooks(list: Book[]) {
+  imported.clear();
+  for (const book of list)
+    if (!LOADERS[book.id]) imported.set(book.id, { book, entry: catalogEntry(book) });
+  books = [...CATALOG, ...[...imported.values()].map(i => i.entry)];
+  markImportedReady();
+  bookListeners.forEach(l => l());
+}
+
+const subscribeBooks = (listener: () => void) => {
+  bookListeners.add(listener);
+  return () => {
+    bookListeners.delete(listener);
+  };
+};
+
+/** Bundled books followed by imported ones. */
+export const useBooks = () => useSyncExternalStore(subscribeBooks, () => books);
+
+export const getCatalogBook = (id: string): CatalogBook | undefined =>
+  catalog[id] ?? imported.get(id)?.entry;
+
+export const isBundled = (id: string) => id in LOADERS;
 
 /** Global, stable key for per-word progress. */
 export const wordKey = (bookId: string, word: Word) => `${bookId}:${word.id}`;
 
 const loaded = new Map<string, Book>();
 
-export const getLoadedBook = (id: string) => loaded.get(id);
+export const getLoadedBook = (id: string) => loaded.get(id) ?? imported.get(id)?.book;
 
 export async function loadBook(id: string): Promise<Book | undefined> {
   const load = LOADERS[id];
-  if (!load) return undefined;
+  if (!load) {
+    await importedReady;
+    return imported.get(id)?.book;
+  }
   const book = (await load()).default as Book;
   loaded.set(id, book);
   return book;
+}
+
+/** What text-to-speech reads for a word: no verb-irregularity marks or "/a" endings. */
+export const spokenText = (es: string) =>
+  es
+    .replace(/\s*\((?:g|i|ie|ue|u|y|zc)\)/g, '')
+    .replace(/\/[a-záéíóúüñ]+/gi, '')
+    .trim();
+
+const isString = (v: unknown): v is string => typeof v === 'string';
+const isRecord = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object';
+const isLinks = (v: unknown) =>
+  v === undefined ||
+  (Array.isArray(v) && v.every(l => isRecord(l) && isString(l.title) && isString(l.url)));
+const isWord = (w: unknown) =>
+  isRecord(w) &&
+  isString(w.id) &&
+  w.id.length > 0 &&
+  isString(w.es) &&
+  isString(w.en) &&
+  (w.audio === undefined || isString(w.audio)) &&
+  (w.image === undefined || isString(w.image));
+const isChapter = (c: unknown) =>
+  isRecord(c) &&
+  isString(c.title) &&
+  isLinks(c.links) &&
+  Array.isArray(c.sections) &&
+  c.sections.length > 0 &&
+  c.sections.every(
+    s =>
+      isRecord(s) &&
+      (s.title === undefined || isString(s.title)) &&
+      Array.isArray(s.words) &&
+      s.words.every(isWord),
+  );
+
+/** Checks that an imported file is a `Book`; returns it, or why not. */
+export function parseBook(value: unknown): Book | string {
+  if (!isRecord(value)) return 'Not a book file.';
+  const { id, title, source, chapters } = value;
+  if (!isString(id) || !/^[a-z0-9][a-z0-9-]{0,99}$/.test(id))
+    return 'The book id must be lowercase letters, digits and dashes.';
+  if (LOADERS[id]) return 'That book is already built in.';
+  if (!isString(title) || !title.trim()) return 'The book has no title.';
+  if (!isRecord(source) || !isString(source.name) || !isString(source.url))
+    return 'The book has no source.';
+  if (!Array.isArray(chapters) || !chapters.length || !chapters.every(isChapter))
+    return 'The book’s chapters aren’t in the expected format.';
+  return value as Book;
 }
 
 /**

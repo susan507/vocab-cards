@@ -1,5 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
+import * as Speech from 'expo-speech';
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
@@ -19,7 +20,7 @@ import {
   useTapGesture,
 } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { reorderKeeping } from '@/lib/books';
+import { reorderKeeping, spokenText } from '@/lib/books';
 import { resolveAudio, resolveImage } from '@/lib/offlineAudio';
 import {
   ORDERS,
@@ -134,9 +135,15 @@ export function Deck({
   }, []);
 
   // Called synchronously from gesture and press handlers so mobile browsers allow playback.
+  // A word without a recording is read out by text-to-speech.
   const play = useCallback(
     (word: Word | undefined) => {
-      if (!word?.audio) return;
+      if (!word) return;
+      Speech.stop();
+      if (!word.audio) {
+        Speech.speak(spokenText(word.es), { language: 'es-ES' });
+        return;
+      }
       player.replace({ uri: resolveAudio(word.audio) });
       player.play();
     },
@@ -370,14 +377,12 @@ export function Deck({
               </Text>
             )}
             {/* Visual cues only: swipe for prev/next, tap anywhere to replay. */}
-            {word.audio ? (
-              <Ionicons
-                name="volume-high-outline"
-                size={28}
-                color={theme.muted}
-                pointerEvents="none"
-              />
-            ) : null}
+            <Ionicons
+              name="volume-high-outline"
+              size={28}
+              color={theme.muted}
+              pointerEvents="none"
+            />
             {index > 0 && !srs ? (
               <Ionicons
                 name="chevron-back"
