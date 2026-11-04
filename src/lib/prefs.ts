@@ -1,7 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect, useMemo, useSyncExternalStore } from 'react';
-import { topicFromKey } from './books';
+import { useCallback, useEffect, useMemo, useSyncExternalStore } from 'react';
+import { CATALOG, topicFromKey } from './books';
 import { credentials } from './credentials';
+import { isProgress, parseProgress, today } from './srs';
+import type { Progress, ProgressMap, Session } from './srs';
 import { supabase } from './supabase';
 import type { AuthResponse } from '@supabase/supabase-js';
 
@@ -112,13 +114,86 @@ function useSetting(key: string) {
   return [value, set] as const;
 }
 
-export const ORDERS = { inOrder: 'In order', random: 'Random' } as const;
+export const ORDERS = { inOrder: 'In order', random: 'Random', srs: 'Spaced' } as const;
 export type Order = keyof typeof ORDERS;
 
 export function useDeckOrder() {
   const [saved, set] = useSetting('deckOrder');
-  const order: Order = saved === 'random' ? 'random' : 'inOrder';
+  const order: Order = saved === 'random' || saved === 'srs' ? saved : 'inOrder';
   return [order, (next: Order) => set(next)] as const;
+}
+
+export const DEFAULT_NEW_PER_DAY = 50;
+
+export function useNewPerDay() {
+  const [saved, set] = useSetting('newPerDay');
+  const n = Number.parseInt(saved ?? '', 10);
+  return [
+    Number.isFinite(n) && n >= 0 ? n : DEFAULT_NEW_PER_DAY,
+    (next: number) => set(String(next)),
+  ] as const;
+}
+
+/** New words started today. Kept on the device only, so another device has its own allowance. */
+export function useNewToday() {
+  const profile = useProfile();
+  const key = profile === undefined ? null : scoped(profile, 'newToday');
+  const raw = usePersisted(key);
+  const count = (r: string | null | undefined) => {
+    const [day, n] = (r ?? '').split(' ');
+    return day === today() ? Number(n) || 0 : 0;
+  };
+  return {
+    count: raw === undefined ? undefined : count(raw),
+    increment: () => {
+      if (key) updatePersisted(key, prev => `${today()} ${count(prev) + 1}`);
+    },
+  };
+}
+
+/** The raw in-progress spaced-repetition session for a deck (parse with `parseSession`); device only. */
+export function useSavedSession(deckKey: string) {
+  const profile = useProfile();
+  const key = profile === undefined ? null : scoped(profile, `session/${deckKey}`);
+  const raw = usePersisted(key);
+  const set = useCallback(
+    (session: Session | null) => {
+      if (key !== null) save(key, JSON.stringify(session));
+    },
+    [key],
+  );
+  return [raw, set] as const;
+}
+
+const progressKey = (profile: Profile | null, bookId: string) =>
+  scoped(profile, `progress/${bookId}`);
+
+const progressRow = (profile: Profile, wordId: string, { updatedAt, ...data }: Progress) => ({
+  user_id: profile.id,
+  word_id: wordId,
+  data,
+  updated_at: updatedAt,
+});
+
+/**
+ * A book's per-word Leitner progress, keyed by `wordKey`; undefined while loading.
+ * ponytail: one JSON blob per book, rewritten on every answer; split it if a book's progress gets to megabytes.
+ */
+export function useProgress(bookId: string) {
+  const profile = useProfile();
+  const key = profile === undefined ? null : progressKey(profile, bookId);
+  const raw = usePersisted(key);
+  const progress = useMemo(() => (raw === undefined ? undefined : parseProgress(raw)), [raw]);
+  const set = (wordId: string, next: Progress) => {
+    if (key === null) return;
+    updatePersisted(key, prev => JSON.stringify({ ...parseProgress(prev), [wordId]: next }));
+    if (profile)
+      supabase
+        .from('word_progress')
+        .upsert(progressRow(profile, wordId, next))
+        .then(logError);
+  };
+  return [progress, set] as const;
 }
 
 const parseKeys = (raw: string | null | undefined): string[] => {
@@ -203,6 +278,51 @@ async function loadProfile(profile: Profile, mergeGuest: boolean) {
     const local = parseKeys(await loadPersisted(key)).filter(k => remote.has(k));
     save(key, JSON.stringify([...new Set([...local, ...remote])]));
   }
+  await loadProgress(profile, mergeGuest);
+}
+
+const PAGE = 1000;
+
+/** Merges the profile's word progress with the local copy, newest `updatedAt` per word winning both ways. */
+async function loadProgress(profile: Profile, mergeGuest: boolean) {
+  const remote = new Map<string, ProgressMap>();
+  for (let from = 0; ; from += PAGE) {
+    const page = await supabase
+      .from('word_progress')
+      .select('word_id, data, updated_at')
+      .order('word_id')
+      .range(from, from + PAGE - 1);
+    if (page.error) return logError(page);
+    for (const row of page.data as { word_id: string; data: unknown; updated_at: string }[]) {
+      const parsed = { ...(row.data as object), updatedAt: new Date(row.updated_at).toISOString() };
+      if (!isProgress(parsed)) continue;
+      const bookId = row.word_id.split(':')[0];
+      const book = remote.get(bookId) ?? {};
+      book[row.word_id] = parsed;
+      remote.set(bookId, book);
+    }
+    if (page.data.length < PAGE) break;
+  }
+  const upload = new Map<string, Progress>();
+  for (const { id } of CATALOG) {
+    const key = progressKey(profile, id);
+    const merged = { ...remote.get(id) };
+    const local = [
+      ...(mergeGuest
+        ? Object.entries(parseProgress(await loadPersisted(progressKey(null, id))))
+        : []),
+      ...Object.entries(parseProgress(await loadPersisted(key))),
+    ];
+    for (const [wordId, p] of local) {
+      if (merged[wordId] && merged[wordId].updatedAt >= p.updatedAt) continue;
+      merged[wordId] = p;
+      upload.set(wordId, p);
+    }
+    save(key, JSON.stringify(merged));
+  }
+  const rows = [...upload].map(([wordId, p]) => progressRow(profile, wordId, p));
+  for (let i = 0; i < rows.length; i += PAGE)
+    logError(await supabase.from('word_progress').upsert(rows.slice(i, i + PAGE)));
 }
 
 /** Returns an error message, or null once signed in. A new name creates the profile. */

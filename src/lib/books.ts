@@ -31,7 +31,7 @@ export async function loadBook(id: string): Promise<Book | undefined> {
 
 /**
  * A deck is just an ordered Word[]: the card screen doesn't know where words came from.
- * Future modes (shuffle, multi-chapter review, spaced repetition) build a different array.
+ * Other modes build a different array from it (`reorderKeeping`, `srsQueue` in srs.ts).
  */
 export function chapterDeck(book: Book, chapter: number, section?: number): Word[] {
   const sections = book.chapters[chapter]?.sections ?? [];
@@ -39,6 +39,9 @@ export function chapterDeck(book: Book, chapter: number, section?: number): Word
     s => s.words,
   );
 }
+
+export const bookDeck = (book: Book): Word[] =>
+  book.chapters.flatMap(c => c.sections.flatMap(s => s.words));
 
 export const chapterMedia = (book: Book, chapter: number, kind: 'audio' | 'image') => [
   ...new Set(chapterDeck(book, chapter).flatMap(w => w[kind] ?? [])),
