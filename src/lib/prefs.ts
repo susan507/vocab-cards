@@ -2,8 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useMemo, useSyncExternalStore } from 'react';
 import { CATALOG, topicFromKey } from './books';
 import { credentials } from './credentials';
-import { isProgress, parseProgress, today } from './srs';
-import type { Progress, ProgressMap, Session } from './srs';
+import { forDirection, isProgress, parseProgress, today } from './srs';
+import type { Direction, Progress, ProgressMap, Session } from './srs';
 import { supabase } from './supabase';
 import type { AuthResponse } from '@supabase/supabase-js';
 
@@ -126,6 +126,13 @@ export function useDeckOrder() {
   return [order, (next: Order) => set(next)] as const;
 }
 
+/** Which side is the prompt; spaced-repetition progress is kept per direction. */
+export function useDirection() {
+  const [saved, set] = useSetting('direction');
+  const dir: Direction = saved === 'enEs' ? 'enEs' : 'esEn';
+  return [dir, (next: Direction) => set(next)] as const;
+}
+
 export const DEFAULT_NEW_PER_DAY = 50;
 
 export function useNewPerDay() {
@@ -137,10 +144,10 @@ export function useNewPerDay() {
   ] as const;
 }
 
-/** New words started today. Kept on the device only, so another device has its own allowance. */
-export function useNewToday() {
+/** New words started today in `dir`. Kept on the device only, so another device has its own allowance. */
+export function useNewToday(dir: Direction) {
   const profile = useProfile();
-  const key = profile === undefined ? null : scoped(profile, 'newToday');
+  const key = profile === undefined ? null : scoped(profile, forDirection('newToday', dir));
   const raw = usePersisted(key);
   const count = (r: string | null | undefined) => {
     const [day, n] = (r ?? '').split(' ');
@@ -154,10 +161,11 @@ export function useNewToday() {
   };
 }
 
-/** The raw in-progress spaced-repetition session for a deck (parse with `parseSession`); device only. */
-export function useSavedSession(deckKey: string) {
+/** The raw in-progress spaced-repetition session for a deck and direction (parse with `parseSession`); device only. */
+export function useSavedSession(deckKey: string, dir: Direction) {
   const profile = useProfile();
-  const key = profile === undefined ? null : scoped(profile, `session/${deckKey}`);
+  const key =
+    profile === undefined ? null : scoped(profile, forDirection(`session/${deckKey}`, dir));
   const raw = usePersisted(key);
   const set = useCallback(
     (session: Session | null) => {
@@ -179,7 +187,7 @@ const progressRow = (profile: Profile, wordId: string, { updatedAt, ...data }: P
 });
 
 /**
- * A book's per-word Leitner progress, keyed by `wordKey`; undefined while loading.
+ * A book's per-word Leitner progress, keyed by `progressKey` (both directions); undefined while loading.
  * ponytail: one JSON blob per book, rewritten on every answer; split it if a book's progress gets to megabytes.
  */
 export function useProgress(bookId: string) {

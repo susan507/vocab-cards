@@ -19,10 +19,11 @@ The source of truth for how the app behaves. Keep it short and high level; updat
 
 ## Flashcards
 
-- Full screen, one background colour, nothing scrolls. Spanish on top, English below, picture above when there is one.
-- Audio plays once when a word appears; tapping anywhere replays it.
+- Full screen, one background colour, nothing scrolls. The prompt language on top, the other below, picture above when there is one.
+- Direction: Spanish → English (default) or English → Spanish, one setting for every chapter and mode, kept per profile.
+- Audio (Spanish) plays once when a word appears; tapping anywhere replays it. Except in English → Spanish spaced repetition, where it waits for the reveal tap.
 - Arrows and an audio icon hint at swiping and tapping; they don't do anything themselves.
-- Top bar: close, mode, word list (jump to any word), extra material links when the chapter has them, position.
+- Top bar: close, mode, direction, word list (jump to any word), extra material links when the chapter has them, position.
 - Modes:
   - In order: swipe left/right for next/previous.
   - Random: same, shuffled.
@@ -31,13 +32,15 @@ The source of truth for how the app behaves. Keep it short and high level; updat
 ## Spaced repetition
 
 - Leitner-style Yes/No piles, like studying with physical cards.
-- The card shows Spanish (audio, picture); tap to reveal English, then answer No or Yes. No swiping.
+- The card shows the prompt side; tap to reveal the other side, then answer No or Yes. No swiping.
+- The picture would give the answer away in Spanish → English, so it appears with the English on reveal; in English → Spanish it shows from the start.
+- Each direction is a separate deck: its own boxes, retired words, daily new-word allowance, saved session and tile freshness bars. Progress from before directions counts as Spanish → English.
 - A session runs in rounds, each shuffled. Round 1 is the whole session deck; every answer goes on a Yes or No pile. The next round is the latest No pile, until a round has no No. Then the words missed in round 1 are revised the same way until each gets a Yes. Yes words don't come back in that session. The round and pile sizes show during a session; when it's over, the session says so.
 - An unfinished session resumes after closing or reloading, the same day only.
 - Chapter session: every word in the chapter (or subtopic), every time.
 - "Review all" session: Leitner boxes over the whole book. Words due today plus never-seen words (taken in book order), with new words capped per day by the setting (counted across sessions).
 - Only round-1 answers (in any session) move boxes: Yes up one box (a new word counts as box 1), No back to box 1. Box n comes back every 2^(n-1) calendar days (box 7, every 64 days, is the top).
-- The ✓ on the card retires a word: it's left out of every session. Retired words show ✓ in the word list; tapping restores them.
+- The ✓ on the card retires a word: it's left out of every session. Retired words show ✓ in the word list; tapping restores them. Both apply to the current direction.
 - No due counts on home or tiles. A chapter tile shows nothing until its words have been studied; after that a bar shows how fresh they are, full just after studying and shrinking until they're due.
 
 ## Profiles

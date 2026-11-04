@@ -16,7 +16,7 @@ import {
   searchTopics,
   topicKey,
 } from '@/lib/books';
-import { useProgress } from '@/lib/prefs';
+import { useDirection, useProgress } from '@/lib/prefs';
 import { strength, today } from '@/lib/srs';
 import type { Book, CatalogBook } from '@/lib/types';
 import { makeStyles, useTheme } from '@/theme';
@@ -71,6 +71,7 @@ export default function ChaptersScreen() {
 /** Per chapter, how well its studied words are remembered right now (0–1), once any are studied. */
 function useChapterStrengths(bookId: string) {
   const [progress] = useProgress(bookId);
+  const [dir] = useDirection();
   const studied = !!progress && Object.keys(progress).length > 0;
   const [book, setBook] = useState<Book | undefined>(() => getLoadedBook(bookId));
   useEffect(() => {
@@ -79,8 +80,8 @@ function useChapterStrengths(bookId: string) {
   return useMemo(() => {
     if (!book || !progress || !studied) return undefined;
     const day = today();
-    return book.chapters.map((_, c) => strength(chapterDeck(book, c), bookId, progress, day));
-  }, [book, progress, studied, bookId]);
+    return book.chapters.map((_, c) => strength(chapterDeck(book, c), bookId, progress, day, dir));
+  }, [book, progress, studied, bookId, dir]);
 }
 
 function ChapterTile({

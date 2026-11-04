@@ -19,11 +19,12 @@ import {
   useTapGesture,
 } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { reorderKeeping, wordKey } from '@/lib/books';
+import { reorderKeeping } from '@/lib/books';
 import { resolveAudio, resolveImage } from '@/lib/offlineAudio';
 import {
   ORDERS,
   useDeckOrder,
+  useDirection,
   useNewPerDay,
   useNewToday,
   useProgress,
@@ -33,14 +34,16 @@ import type { Order } from '@/lib/prefs';
 import {
   answer,
   answerProgress,
+  DIRECTIONS,
   isFirstRound,
   parseSession,
+  progressKey,
   removeWord,
   setRetired,
   startSession,
   today,
 } from '@/lib/srs';
-import type { ProgressMap, Session } from '@/lib/srs';
+import type { Direction, ProgressMap, Session } from '@/lib/srs';
 import type { Link, Word } from '@/lib/types';
 import { makeStyles, useTheme } from '@/theme';
 
@@ -52,14 +55,21 @@ const MODE_ROW = 40;
 // Room for the round line, the Yes/No buttons and the retire control under a spaced-repetition card.
 const ANSWER_SPACE = 136;
 
-/** Picks a spaced-repetition session's word ids (see srs.ts); `newLeft` is today's remaining new words. */
-export type SessionDeck = (progress: ProgressMap, newLeft: number, day: string) => string[];
+/** Picks a spaced-repetition session's word ids (see srs.ts); `newLeft` is today's remaining new words in `dir`. */
+export type SessionDeck = (
+  progress: ProgressMap,
+  newLeft: number,
+  day: string,
+  dir: Direction,
+) => string[];
 
 // `order` is null until the spaced-repetition session is ready (progress still loading).
 type DeckView = {
   items: Word[];
   index: number;
   order: Order | null;
+  /** The direction `session` belongs to. */
+  dir: Direction;
   revealed: boolean;
   session: Session | null;
 };
@@ -68,7 +78,7 @@ type DeckView = {
  * Full-screen flashcards. Swipe left/right = next/prev, tap = replay audio.
  * `words` is in source order; the saved deck order (or a fixed `mode`) decides what's shown.
  * Spaced repetition: a session of Yes/No rounds over `sessionDeck`'s words, saved under `sessionKey`;
- * tap reveals the English.
+ * tap reveals the other side. The direction setting decides which side is the prompt.
  */
 export function Deck({
   words,
@@ -90,16 +100,20 @@ export function Deck({
   const [savedOrder, setOrder] = useDeckOrder();
   const order = mode ?? savedOrder;
   const srs = order === 'srs';
+  const [dir, setDir] = useDirection();
+  // EN→ES spaced repetition: the Spanish audio would give the answer away, so it waits for the reveal.
+  const autoPlay = dir === 'esEn';
   const [progress, setProgress] = useProgress(bookId);
   const [newPerDay] = useNewPerDay();
-  const newToday = useNewToday();
-  const [savedSession, saveSession] = useSavedSession(sessionKey);
+  const newToday = useNewToday(dir);
+  const [savedSession, saveSession] = useSavedSession(sessionKey, dir);
   const byId = useMemo(() => new Map(words.map(w => [w.id, w])), [words]);
   const [view, setView] = useState<DeckView>(() =>
     srs
-      ? { items: [], index: 0, order: null, revealed: false, session: null }
+      ? { items: [], index: 0, order: null, dir, revealed: false, session: null }
       : {
           order,
+          dir,
           revealed: false,
           session: null,
           ...reorderKeeping(words, undefined, order === 'random'),
@@ -150,13 +164,14 @@ export function Deck({
     [byId],
   );
 
-  // The saved order can change from the toggle or finish loading after mount.
+  // The saved order and direction can change from the toggles or finish loading after mount.
   useEffect(() => {
     const current = viewRef.current;
-    if (current.order === order) return;
+    if (current.order === order && (order !== 'srs' || current.dir === dir)) return;
     if (order !== 'srs') {
       show({
         order,
+        dir,
         revealed: false,
         session: null,
         ...reorderKeeping(words, wordOf(current), order === 'random'),
@@ -168,12 +183,14 @@ export function Deck({
     const day = today();
     const session =
       parseSession(savedSession, day) ??
-      startSession(sessionDeck(progress, Math.max(0, newPerDay - newToday.count), day), day);
+      startSession(sessionDeck(progress, Math.max(0, newPerDay - newToday.count), day, dir), day);
     saveSession(session.queue.length ? session : null);
-    show({ ...current, order, session, revealed: false });
-    play(byId.get(session.queue[0] ?? ''));
+    show({ ...current, order, dir, session, revealed: false });
+    if (autoPlay) play(byId.get(session.queue[0] ?? ''));
   }, [
     order,
+    dir,
+    autoPlay,
     words,
     show,
     play,
@@ -198,16 +215,16 @@ export function Deck({
     // A finished session isn't kept: the next one starts afresh.
     saveSession(session.queue.length ? session : null);
     show({ ...viewRef.current, session, revealed: false });
-    play(byId.get(session.queue[0] ?? ''));
+    if (autoPlay) play(byId.get(session.queue[0] ?? ''));
   };
 
   const onAnswer = (yes: boolean) => {
     const current = viewRef.current;
     const { session, revealed } = current;
     const word = wordOf(current);
-    if (!session || !word || !revealed || !progress) return;
+    if (!session || !word || !revealed || !progress || current.dir !== dir) return;
     if (isFirstRound(session)) {
-      const key = wordKey(bookId, word);
+      const key = progressKey(bookId, word, dir);
       const prev = progress[key];
       setProgress(key, answerProgress(prev, yes, session.day, new Date()));
       if (!prev?.box) newToday.increment();
@@ -218,8 +235,8 @@ export function Deck({
   const retire = () => {
     const current = viewRef.current;
     const word = wordOf(current);
-    if (!current.session || !word || !progress) return;
-    const key = wordKey(bookId, word);
+    if (!current.session || !word || !progress || current.dir !== dir) return;
+    const key = progressKey(bookId, word, dir);
     setProgress(key, setRetired(progress[key], true, new Date()));
     moveOn(removeWord(current.session, word.id));
   };
@@ -273,8 +290,8 @@ export function Deck({
     ? Math.min(72, Math.max(32, (word.image ? Math.min(width, height) : width) * 0.1))
     : 32;
   const bottomSpace = insets.bottom + (srs ? ANSWER_SPACE : CHROME_SPACE);
-  // Three modes don't fit beside the other controls on a small phone: they get their own row.
-  const narrow = width < 400 && !mode;
+  // The mode and direction toggles don't fit beside the other controls on a phone: they get their own row.
+  const narrow = width < 480 && !mode;
   const topSpace = insets.top + CHROME_SPACE + (narrow ? MODE_ROW : 0);
   const modeToggle = (
     <View style={styles.segmented} accessibilityRole="radiogroup">
@@ -292,6 +309,28 @@ export function Deck({
           </Text>
         </Pressable>
       ))}
+    </View>
+  );
+  const nextDir: Direction = dir === 'esEn' ? 'enEs' : 'esEn';
+  const dirToggle = (
+    <Pressable
+      onPress={() => {
+        setDir(nextDir);
+        // Space and Enter reveal the card; left focused here they would also switch back.
+        if (Platform.OS === 'web') (document.activeElement as HTMLElement | null)?.blur();
+      }}
+      hitSlop={{ top: 12, bottom: 12 }}
+      accessibilityRole="button"
+      accessibilityLabel={`Direction ${DIRECTIONS[dir]}. Switch to ${DIRECTIONS[nextDir]}`}
+      style={[styles.segmented, styles.segment]}
+    >
+      <Text style={styles.segmentText}>{DIRECTIONS[dir]}</Text>
+    </Pressable>
+  );
+  const toggles = (
+    <View style={styles.toggles}>
+      {mode ? null : modeToggle}
+      {dirToggle}
     </View>
   );
 
@@ -313,15 +352,22 @@ export function Deck({
             {word.image ? (
               <Image
                 source={{ uri: resolveImage(word.image) }}
-                style={styles.image}
+                // ES→EN spaced repetition: the picture gives the answer away. Hidden, not removed, so nothing moves on reveal.
+                style={[styles.image, srs && dir === 'esEn' && !revealed && styles.hidden]}
                 resizeMode="contain"
               />
             ) : null}
-            <Text style={[styles.es, { fontSize: esSize }]}>{word.es}</Text>
+            <Text style={[styles.es, { fontSize: esSize }]}>
+              {dir === 'esEn' ? word.es : word.en}
+            </Text>
             {srs && !revealed ? (
-              <Text style={styles.hint}>Tap to see the English</Text>
+              <Text style={styles.hint}>
+                Tap to see the {dir === 'esEn' ? 'English' : 'Spanish'}
+              </Text>
             ) : (
-              <Text style={[styles.en, { fontSize: esSize * 0.5 }]}>{word.en}</Text>
+              <Text style={[styles.en, { fontSize: esSize * 0.5 }]}>
+                {dir === 'esEn' ? word.en : word.es}
+              </Text>
             )}
             {/* Visual cues only: swipe for prev/next, tap anywhere to replay. */}
             {word.audio ? (
@@ -403,7 +449,7 @@ export function Deck({
         >
           <Text style={styles.chrome}>✕</Text>
         </Pressable>
-        {narrow || mode ? <View /> : modeToggle}
+        {narrow ? <View /> : toggles}
         <View style={styles.topRight}>
           {links?.length ? (
             <Pressable
@@ -430,7 +476,7 @@ export function Deck({
           )}
         </View>
       </View>
-      {narrow ? <View style={[styles.modeRow, { top: insets.top + 48 }]}>{modeToggle}</View> : null}
+      {narrow ? <View style={[styles.modeRow, { top: insets.top + 48 }]}>{toggles}</View> : null}
       <Modal
         visible={panel !== undefined}
         animationType="fade"
@@ -473,7 +519,7 @@ export function Deck({
               initialScrollIndex={srs ? 0 : Math.max(0, index - 2)}
               style={styles.listBody}
               renderItem={({ item, index: i }) => {
-                const key = wordKey(bookId, item);
+                const key = progressKey(bookId, item, dir);
                 const retired = srs && progress?.[key]?.retired;
                 return (
                   <Pressable
@@ -549,6 +595,7 @@ const useStyles = makeStyles(theme => ({
     borderRadius: 8,
     padding: 2,
   },
+  toggles: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   segment: { paddingVertical: 4, paddingHorizontal: 10, borderRadius: 6 },
   segmentActive: { backgroundColor: theme.accent },
   segmentText: { color: theme.muted, fontSize: 13, fontWeight: '600' },
@@ -557,6 +604,7 @@ const useStyles = makeStyles(theme => ({
   arrow: { position: 'absolute', top: '50%', marginTop: -18, opacity: 0.6 },
   // Takes whatever height the text leaves, so an image card never overflows a short screen.
   image: { width: '100%', maxWidth: 480, maxHeight: 360, flexGrow: 1, flexShrink: 1, flexBasis: 0 },
+  hidden: { opacity: 0 },
   es: { color: theme.text, fontWeight: '600', textAlign: 'center' },
   en: { color: theme.muted, textAlign: 'center' },
   hint: { color: theme.muted, fontSize: 15, textAlign: 'center', opacity: 0.7 },

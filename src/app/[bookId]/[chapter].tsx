@@ -30,10 +30,10 @@ export default function ChapterDeckScreen() {
     return chapterDeck(book, Number(chapter), section === undefined ? undefined : Number(section));
   }, [book, all, chapter, section]);
   const sessionDeck = useCallback<SessionDeck>(
-    (progress, newLeft, day) =>
+    (progress, newLeft, day, dir) =>
       all
-        ? reviewSessionIds(words, bookId, progress, newLeft, day)
-        : chapterSessionIds(words, bookId, progress),
+        ? reviewSessionIds(words, bookId, progress, newLeft, day, dir)
+        : chapterSessionIds(words, bookId, progress, dir),
     [all, words, bookId],
   );
   const close = () => (router.canGoBack() ? router.back() : router.replace(`/${bookId}`));
