@@ -2,15 +2,15 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import type { Href } from 'expo-router';
 import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
+import { Pressable, ScrollView, Text } from 'react-native';
 import { DownloadControl } from '@/components/DownloadControl';
 import { SearchBox } from '@/components/SearchBox';
-import { Tile, TileGrid, TopicTile, tileStyles } from '@/components/Tile';
+import { Tile, TileGrid, TopicTile, useTileStyles } from '@/components/Tile';
 import { CATALOG, searchTopics, topicKey } from '@/lib/books';
 import type { Topic } from '@/lib/books';
 import { useCollapsed, useDone, useStars } from '@/lib/prefs';
 import type { CatalogBook } from '@/lib/types';
-import { COLORS } from '@/theme';
+import { makeStyles, useTheme } from '@/theme';
 
 const MAX_RESULTS = 100;
 
@@ -19,6 +19,7 @@ export default function BooksScreen() {
   const results = useMemo(() => searchTopics(query), [query]);
   const { topics: starred } = useStars();
   const { topics: learned } = useDone();
+  const tileStyles = useTileStyles();
 
   return (
     <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={tileStyles.screen}>
@@ -73,6 +74,9 @@ function Section({
   children: ReactNode;
 }) {
   const [collapsed, toggle] = useCollapsed(id, collapsedByDefault);
+  const theme = useTheme();
+  const styles = useStyles();
+  const tileStyles = useTileStyles();
   return (
     <>
       <Pressable
@@ -84,7 +88,7 @@ function Section({
         <Ionicons
           name={collapsed ? 'chevron-forward' : 'chevron-down'}
           size={14}
-          color={COLORS.muted}
+          color={theme.muted}
         />
         <Text style={tileStyles.heading}>{title}</Text>
       </Pressable>
@@ -104,7 +108,7 @@ const TopicTiles = ({ topics }: { topics: Topic[] }) => (
 const wordCount = (book: CatalogBook) =>
   book.chapters.reduce((n, c) => n + c.sections.reduce((m, s) => m + s.count, 0), 0);
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(theme => ({
   heading: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start' },
   pressed: { opacity: 0.6 },
-});
+}));

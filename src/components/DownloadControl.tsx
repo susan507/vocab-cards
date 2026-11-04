@@ -1,8 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
+import { ActivityIndicator, Pressable, Text } from 'react-native';
 import { useOfflineStatus } from '@/lib/offlineAudio';
 import type { DownloadJob, OfflineStatus } from '@/lib/offlineAudio';
-import { COLORS } from '@/theme';
+import { makeStyles, useTheme } from '@/theme';
 
 /** Whole-book row without `chapter`; a compact icon for a chapter tile corner with it. */
 export function DownloadControl({ bookId, chapter }: { bookId: string; chapter?: number }) {
@@ -32,6 +32,7 @@ function BookControl({ status, downloaded }: Props) {
           ? `${downloaded.size}/${status.chapterCount} chapters offline — tap to download all`
           : 'Download for offline';
   const actionable = !job?.running && !complete;
+  const styles = useStyles();
   return (
     <Pressable
       accessibilityRole="button"
@@ -49,6 +50,8 @@ function ChapterControl({ status, downloaded, chapter }: Props & { chapter: numb
   const complete = downloaded.has(chapter);
   const running = !complete && (job?.running || status.book?.running);
   const actionable = !complete && !running;
+  const styles = useStyles();
+  const theme = useTheme();
   return (
     // Stays enabled when idle so a tap never falls through to the parent tile.
     <Pressable
@@ -68,24 +71,24 @@ function ChapterControl({ status, downloaded, chapter }: Props & { chapter: numb
       style={({ pressed }) => [styles.icon, actionable && pressed && styles.pressed]}
     >
       {complete ? (
-        <Ionicons name="checkmark-circle" size={20} color={COLORS.muted} />
+        <Ionicons name="checkmark-circle" size={20} color={theme.muted} />
       ) : job?.running && job.total ? (
         <Text style={styles.progress}>{progressText(job)}</Text>
       ) : running ? (
-        <ActivityIndicator size="small" color={COLORS.muted} />
+        <ActivityIndicator size="small" color={theme.muted} />
       ) : job?.failed ? (
-        <Ionicons name="alert-circle-outline" size={20} color="#ffd166" />
+        <Ionicons name="alert-circle-outline" size={20} color={theme.danger} />
       ) : (
-        <Ionicons name="cloud-download-outline" size={20} color={COLORS.muted} />
+        <Ionicons name="cloud-download-outline" size={20} color={theme.muted} />
       )}
     </Pressable>
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(theme => ({
   row: { paddingTop: 0, paddingBottom: 14, paddingHorizontal: 20 },
-  label: { color: COLORS.muted, fontSize: 13 },
+  label: { color: theme.muted, fontSize: 13 },
   icon: { minWidth: 24, minHeight: 24, alignItems: 'center', justifyContent: 'center' },
-  progress: { color: COLORS.muted, fontSize: 11 },
+  progress: { color: theme.muted, fontSize: 11 },
   pressed: { opacity: 0.6 },
-});
+}));

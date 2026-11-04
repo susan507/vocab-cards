@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { tileStyles } from '@/components/Tile';
+import { Pressable, Text, TextInput, View } from 'react-native';
+import { useTileStyles } from '@/components/Tile';
 import { signIn, signOut, useProfile } from '@/lib/prefs';
-import { COLORS } from '@/theme';
+import { makeStyles, useTheme } from '@/theme';
 
 const close = () => (router.canGoBack() ? router.back() : router.replace('/'));
 
@@ -13,6 +13,9 @@ export default function ProfileScreen() {
   const [pin, setPin] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const theme = useTheme();
+  const styles = useStyles();
+  const tileStyles = useTileStyles();
 
   const submit = async () => {
     setBusy(true);
@@ -50,7 +53,7 @@ export default function ProfileScreen() {
         value={name}
         onChangeText={setName}
         placeholder="Name"
-        placeholderTextColor={COLORS.muted}
+        placeholderTextColor={theme.muted}
         autoCapitalize="none"
         autoCorrect={false}
         maxLength={30}
@@ -60,7 +63,7 @@ export default function ProfileScreen() {
         value={pin}
         onChangeText={text => setPin(text.replace(/\D/g, ''))}
         placeholder="PIN (4–6 digits)"
-        placeholderTextColor={COLORS.muted}
+        placeholderTextColor={theme.muted}
         keyboardType="number-pad"
         secureTextEntry
         maxLength={6}
@@ -86,6 +89,7 @@ function Button({
   onPress: () => void;
   disabled?: boolean;
 }) {
+  const styles = useStyles();
   return (
     <Pressable
       accessibilityRole="button"
@@ -98,25 +102,27 @@ function Button({
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(theme => ({
   form: { gap: 12, maxWidth: 420 },
-  text: { color: COLORS.text, fontSize: 15 },
+  text: { color: theme.text, fontSize: 15 },
   input: {
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 10,
-    backgroundColor: COLORS.surface,
-    color: COLORS.text,
+    backgroundColor: theme.surface,
+    borderWidth: 1,
+    borderColor: theme.border,
+    color: theme.text,
     fontSize: 16,
   },
-  error: { color: '#ff8fa3', fontSize: 14 },
-  note: { color: COLORS.muted, fontSize: 13 },
+  error: { color: theme.danger, fontSize: 14 },
+  note: { color: theme.muted, fontSize: 13 },
   button: {
-    backgroundColor: COLORS.text,
+    backgroundColor: theme.accent,
     borderRadius: 10,
     paddingVertical: 12,
     alignItems: 'center',
   },
-  buttonText: { color: COLORS.background, fontSize: 16, fontWeight: '600' },
+  buttonText: { color: theme.onAccent, fontSize: 16, fontWeight: '600' },
   pressed: { opacity: 0.6 },
-});
+}));

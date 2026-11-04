@@ -2,11 +2,11 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import type { Href } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SearchBox } from '@/components/SearchBox';
 import { DownloadControl } from '@/components/DownloadControl';
 import { StarButton } from '@/components/StarButton';
-import { Tile, TileGrid, TopicTile, tileStyles } from '@/components/Tile';
+import { Tile, TileGrid, TopicTile, useTileStyles } from '@/components/Tile';
 import {
   chapterDeck,
   deckPath,
@@ -19,7 +19,7 @@ import {
 import { useProgress } from '@/lib/prefs';
 import { strength, today } from '@/lib/srs';
 import type { Book, CatalogBook } from '@/lib/types';
-import { COLORS } from '@/theme';
+import { makeStyles, useTheme } from '@/theme';
 
 export default function ChaptersScreen() {
   const { bookId } = useLocalSearchParams<{ bookId: string }>();
@@ -27,6 +27,7 @@ export default function ChaptersScreen() {
   const [query, setQuery] = useState('');
   const results = useMemo(() => (book ? searchTopics(query, [book]) : []), [book, query]);
   const strengths = useChapterStrengths(bookId);
+  const tileStyles = useTileStyles();
 
   if (!book) return null;
 
@@ -93,6 +94,8 @@ function ChapterTile({
 }) {
   const chapter = book.chapters[c];
   const key = topicKey({ book, chapter: c });
+  const theme = useTheme();
+  const styles = useStyles();
   return (
     <Tile
       href={deckPath({ book, chapter: c }) as Href}
@@ -130,7 +133,7 @@ function ChapterTile({
           <Ionicons
             name="link"
             size={18}
-            color={COLORS.muted}
+            color={theme.muted}
             accessibilityLabel="Has extra material"
           />
         ) : null}
@@ -140,16 +143,16 @@ function ChapterTile({
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(theme => ({
   pressed: { opacity: 0.6 },
   bar: {
     height: 4,
     borderRadius: 2,
-    backgroundColor: COLORS.background,
+    backgroundColor: theme.border,
     overflow: 'hidden',
     marginTop: 12,
   },
-  barFill: { height: '100%', backgroundColor: COLORS.muted },
+  barFill: { height: '100%', backgroundColor: theme.accent },
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -162,12 +165,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
-    backgroundColor: COLORS.background,
+    backgroundColor: theme.bg,
     maxWidth: '100%',
     borderRadius: 999,
     paddingVertical: 4,
     paddingLeft: 12,
     paddingRight: 6,
   },
-  chipText: { color: COLORS.text, fontSize: 14, flexShrink: 1 },
-});
+  chipText: { color: theme.text, fontSize: 14, flexShrink: 1 },
+}));

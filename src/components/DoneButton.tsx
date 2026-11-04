@@ -1,11 +1,12 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Pressable, StyleSheet } from 'react-native';
 import { useDone } from '@/lib/prefs';
-import { COLORS } from '@/theme';
+import { useTheme } from '@/theme';
 
 export function DoneButton({ topicKey }: { topicKey: string }) {
   const done = useDone();
   const checked = done.has(topicKey);
+  const theme = useTheme();
   return (
     <Pressable
       accessibilityRole="checkbox"
@@ -18,7 +19,7 @@ export function DoneButton({ topicKey }: { topicKey: string }) {
       <Ionicons
         name={checked ? 'checkmark-circle' : 'checkmark-circle-outline'}
         size={24}
-        color={checked ? '#80ed99' : COLORS.muted}
+        color={checked ? theme.accent : theme.muted}
       />
     </Pressable>
   );

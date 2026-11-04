@@ -111,8 +111,11 @@ function useSetting(key: string) {
     save(settingsKey, JSON.stringify(settings));
     supabase.from('profiles').update({ settings }).eq('id', profile.id).then(logError);
   };
-  return [value, set] as const;
+  return [value, set, raw !== undefined] as const;
 }
+
+/** The colour theme's id; the last item is false until the saved value has loaded. */
+export const useThemeSetting = () => useSetting('theme');
 
 export const ORDERS = { inOrder: 'In order', random: 'Random', srs: 'Spaced' } as const;
 export type Order = keyof typeof ORDERS;
