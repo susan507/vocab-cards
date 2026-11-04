@@ -5,9 +5,11 @@ import {
   answerProgress,
   chapterSessionIds,
   daysBetween,
+  forDirection,
   isDue,
   isFirstRound,
   parseSession,
+  progressKey,
   removeWord,
   reviewSessionIds,
   setRetired,
@@ -115,17 +117,34 @@ test('review deck: due and unseen words in book order, unseen capped; retired sk
     [key(3)]: { box: 3, last: '2026-01-01', updatedAt: '' }, // due on the 5th
     [key(4)]: { retired: true, updatedAt: '' },
   };
-  assert.deepEqual(reviewSessionIds(words, 'b', progress, 2, '2026-01-02'), ['0', '1', '2']);
-  assert.deepEqual(reviewSessionIds(words, 'b', progress, 0, '2026-01-05'), ['1', '3']);
-  assert.deepEqual(reviewSessionIds(words, 'b', progress, 9, '2026-01-01'), ['0', '2', '5']);
+  assert.deepEqual(reviewSessionIds(words, 'b', progress, 2, '2026-01-02', 'esEn'), [
+    '0',
+    '1',
+    '2',
+  ]);
+  assert.deepEqual(reviewSessionIds(words, 'b', progress, 0, '2026-01-05', 'esEn'), ['1', '3']);
+  assert.deepEqual(reviewSessionIds(words, 'b', progress, 9, '2026-01-01', 'esEn'), [
+    '0',
+    '2',
+    '5',
+  ]);
 });
 
 test('chapter deck is every word except retired ones; restoring brings a word back', () => {
   const retired = setRetired(undefined, true, now);
-  assert.deepEqual(chapterSessionIds(words, 'b', { [key(2)]: retired }), ['0', '1', '3', '4', '5']);
+  assert.deepEqual(chapterSessionIds(words, 'b', { [key(2)]: retired }, 'esEn'), [
+    '0',
+    '1',
+    '3',
+    '4',
+    '5',
+  ]);
   const restored = setRetired(retired, false, now);
-  assert.equal(chapterSessionIds(words, 'b', { [key(2)]: restored }).length, 6);
-  assert.deepEqual(reviewSessionIds(words, 'b', { [key(2)]: restored }, 9, '2026-01-01').length, 6);
+  assert.equal(chapterSessionIds(words, 'b', { [key(2)]: restored }, 'esEn').length, 6);
+  assert.deepEqual(
+    reviewSessionIds(words, 'b', { [key(2)]: restored }, 9, '2026-01-01', 'esEn').length,
+    6,
+  );
 });
 
 test('strength: nothing until studied, full when fresh, shrinking to 0 when due; retired ignored', () => {
@@ -134,11 +153,11 @@ test('strength: nothing until studied, full when fresh, shrinking to 0 when due;
     [key(1)]: { box: 3, last: '2026-01-01', updatedAt: '' },
     [key(2)]: { box: 1, last: '2025-12-01', retired: true, updatedAt: '' },
   };
-  assert.equal(strength(words, 'b', {}, '2026-01-01'), undefined);
-  assert.equal(strength(words.slice(2), 'b', progress, '2026-01-01'), undefined);
-  assert.equal(strength(words, 'b', progress, '2026-01-01'), 1);
-  assert.equal(strength(words, 'b', progress, '2026-01-02'), (0.5 + 0.75) / 2);
-  assert.equal(strength(words, 'b', progress, '2026-02-01'), 0);
+  assert.equal(strength(words, 'b', {}, '2026-01-01', 'esEn'), undefined);
+  assert.equal(strength(words.slice(2), 'b', progress, '2026-01-01', 'esEn'), undefined);
+  assert.equal(strength(words, 'b', progress, '2026-01-01', 'esEn'), 1);
+  assert.equal(strength(words, 'b', progress, '2026-01-02', 'esEn'), (0.5 + 0.75) / 2);
+  assert.equal(strength(words, 'b', progress, '2026-02-01', 'esEn'), 0);
 });
 
 test('a saved session resumes only on the same day', () => {
@@ -147,4 +166,39 @@ test('a saved session resumes only on the same day', () => {
   assert.equal(parseSession(JSON.stringify(s), '2026-01-02'), null);
   assert.equal(parseSession('null', '2026-01-01'), null);
   assert.equal(parseSession('{"day":"2026-01-01"}', '2026-01-01'), null);
+});
+
+test('directions are separate decks; legacy keys read as ES→EN', () => {
+  const day = '2026-01-02';
+  // Progress saved before directions existed uses the plain word key.
+  const legacy: ProgressMap = {
+    [key(0)]: { box: 1, last: '2026-01-01', updatedAt: '' },
+    [key(1)]: { retired: true, updatedAt: '' },
+  };
+  assert.equal(progressKey('b', words[0], 'esEn'), key(0));
+  assert.equal(progressKey('b', words[0], 'enEs'), `${key(0)}:en`);
+  assert.deepEqual(reviewSessionIds(words, 'b', legacy, 1, day, 'esEn'), ['0', '2']);
+  assert.deepEqual(reviewSessionIds(words, 'b', legacy, 1, day, 'enEs'), ['0']);
+  assert.equal(chapterSessionIds(words, 'b', legacy, 'esEn').length, 5);
+  assert.equal(chapterSessionIds(words, 'b', legacy, 'enEs').length, 6);
+  assert.equal(strength(words, 'b', legacy, day, 'enEs'), undefined);
+
+  // Answering and retiring in EN→ES leave ES→EN as it was.
+  const both: ProgressMap = {
+    ...legacy,
+    [progressKey('b', words[0], 'enEs')]: answerProgress(undefined, true, day, now),
+    [progressKey('b', words[2], 'enEs')]: setRetired(undefined, true, now),
+  };
+  assert.equal(both[key(0)].box, 1);
+  assert.equal(both[`${key(0)}:en`].box, 2);
+  assert.deepEqual(reviewSessionIds(words, 'b', both, 1, day, 'esEn'), ['0', '2']);
+  assert.deepEqual(reviewSessionIds(words, 'b', both, 1, day, 'enEs'), ['1']);
+  assert.deepEqual(chapterSessionIds(words, 'b', both, 'enEs'), ['0', '1', '3', '4', '5']);
+  assert.equal(strength(words, 'b', both, day, 'esEn'), 0);
+  assert.equal(strength(words, 'b', both, day, 'enEs'), 1);
+
+  // Saved sessions and the daily new-word count live under per-direction keys.
+  assert.equal(forDirection('session/b/all', 'esEn'), 'session/b/all');
+  assert.notEqual(forDirection('session/b/all', 'enEs'), forDirection('session/b/all', 'esEn'));
+  assert.notEqual(forDirection('newToday', 'enEs'), 'newToday');
 });

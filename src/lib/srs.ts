@@ -17,6 +17,17 @@ export type Progress = {
 };
 export type ProgressMap = Record<string, Progress>;
 
+/** Which side is the prompt. Each direction is a separate spaced-repetition deck. */
+export const DIRECTIONS = { esEn: 'ES → EN', enEs: 'EN → ES' } as const;
+export type Direction = keyof typeof DIRECTIONS;
+
+/** A storage key for `dir`. ES→EN keeps the plain key, so data saved before directions existed stays ES→EN. */
+export const forDirection = (key: string, dir: Direction) => (dir === 'enEs' ? `${key}:en` : key);
+
+/** A word's key in a `ProgressMap` (and its `word_progress.word_id`). */
+export const progressKey = (bookId: string, word: Word, dir: Direction) =>
+  forDirection(wordKey(bookId, word), dir);
+
 export const MAX_BOX = 7;
 
 /** Box n comes back every 2^(n-1) days: 1, 2, 4 … 64. */
@@ -80,8 +91,12 @@ export const setRetired = (prev: Progress | undefined, retired: boolean, now: Da
 });
 
 /** A chapter session: every word that isn't retired. */
-export const chapterSessionIds = (words: readonly Word[], bookId: string, progress: ProgressMap) =>
-  words.filter(w => !progress[wordKey(bookId, w)]?.retired).map(w => w.id);
+export const chapterSessionIds = (
+  words: readonly Word[],
+  bookId: string,
+  progress: ProgressMap,
+  dir: Direction,
+) => words.filter(w => !progress[progressKey(bookId, w, dir)]?.retired).map(w => w.id);
 
 /** "Review all": due words and up to `newLimit` never-answered words, in book order. */
 export function reviewSessionIds(
@@ -90,11 +105,12 @@ export function reviewSessionIds(
   progress: ProgressMap,
   newLimit: number,
   day: string,
+  dir: Direction,
 ): string[] {
   const ids: string[] = [];
   let fresh = 0;
   for (const word of words) {
-    const p = progress[wordKey(bookId, word)];
+    const p = progress[progressKey(bookId, word, dir)];
     if (p?.retired) continue;
     if (isDue(p, day)) ids.push(word.id);
     else if (!studied(p) && fresh < newLimit) {
@@ -111,11 +127,12 @@ export function strength(
   bookId: string,
   progress: ProgressMap,
   day: string,
+  dir: Direction,
 ): number | undefined {
   let sum = 0;
   let n = 0;
   for (const word of words) {
-    const p = progress[wordKey(bookId, word)];
+    const p = progress[progressKey(bookId, word, dir)];
     if (!studied(p) || p.retired) continue;
     sum += Math.max(0, 1 - daysBetween(p.last, day) / intervalDays(p.box));
     n++;
