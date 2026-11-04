@@ -2597,6 +2597,172 @@
       }
     ]
   },
+  "gente-hoy-1": {
+    "id": "gente-hoy-1",
+    "title": "Gente Hoy 1",
+    "source": {
+      "name": "SpanishDict",
+      "url": "https://www.spanishdict.com/textbooks/26"
+    },
+    "chapters": [
+      {
+        "title": "Unidad 1 - gente que estudia español",
+        "sections": [
+          {
+            "count": 121
+          }
+        ],
+        "links": [
+          {
+            "title": "Numbers in Spanish",
+            "url": "https://www.spanishdict.com/guide/numbers-in-spanish-0-100"
+          },
+          {
+            "title": "Subject Pronouns in Spanish",
+            "url": "https://www.spanishdict.com/guide/subject-pronouns-in-spanish"
+          },
+          {
+            "title": "Definite Articles in Spanish",
+            "url": "https://www.spanishdict.com/guide/definite-articles-in-spanish"
+          }
+        ]
+      },
+      {
+        "title": "Unidad 2 - gente con gente",
+        "sections": [
+          {
+            "count": 134
+          }
+        ],
+        "links": [
+          {
+            "title": "Possessive Pronouns in Spanish",
+            "url": "https://www.spanishdict.com/guide/possessive-pronouns-in-spanish"
+          },
+          {
+            "title": "Numbers in Spanish",
+            "url": "https://www.spanishdict.com/guide/numbers-in-spanish-0-100"
+          }
+        ]
+      },
+      {
+        "title": "Unidad 3 - gente de vacaciones",
+        "sections": [
+          {
+            "count": 56
+          }
+        ],
+        "links": [
+          {
+            "title": "Verbs like \"Gustar\"",
+            "url": "https://www.spanishdict.com/guide/verbs-like-gustar"
+          }
+        ]
+      },
+      {
+        "title": "Unidad 4 - gente de compras",
+        "sections": [
+          {
+            "count": 99
+          }
+        ],
+        "links": [
+          {
+            "title": "Numbers in Spanish",
+            "url": "https://www.spanishdict.com/guide/numbers-in-spanish-0-100"
+          }
+        ]
+      },
+      {
+        "title": "Unidad 5 - gente en forma",
+        "sections": [
+          {
+            "count": 70
+          }
+        ],
+        "links": [
+          {
+            "title": "Reflexive Verbs and Reflexive Pronouns",
+            "url": "https://www.spanishdict.com/guide/reflexive-verbs-and-reflexive-pronouns"
+          },
+          {
+            "title": "Negation and Negative Words in Spanish",
+            "url": "https://www.spanishdict.com/guide/negation-and-negative-words-in-spanish"
+          },
+          {
+            "title": "Spanish Adverbs",
+            "url": "https://www.spanishdict.com/guide/spanish-adverbs"
+          }
+        ]
+      },
+      {
+        "title": "Unidad 6 - gente que come bien",
+        "sections": [
+          {
+            "count": 81
+          }
+        ]
+      },
+      {
+        "title": "Unidad 7 - gente que trabaja",
+        "sections": [
+          {
+            "count": 81
+          }
+        ],
+        "links": [
+          {
+            "title": "Spanish Preterite Perfect Tense",
+            "url": "https://www.spanishdict.com/guide/spanish-preterite-perfect-tense"
+          },
+          {
+            "title": "Using \"Estar\" with Conditions",
+            "url": "https://www.spanishdict.com/guide/using-estar-with-conditions"
+          }
+        ]
+      },
+      {
+        "title": "Unidad 8 - gente que viaja",
+        "sections": [
+          {
+            "count": 37
+          }
+        ]
+      },
+      {
+        "title": "Unidad 9 - gente de ciudad",
+        "sections": [
+          {
+            "count": 42
+          }
+        ]
+      },
+      {
+        "title": "Unidad 10 - gente y fechas",
+        "sections": [
+          {
+            "count": 24
+          }
+        ]
+      },
+      {
+        "title": "Unidad 11 - gente en casa",
+        "sections": [
+          {
+            "count": 43
+          }
+        ]
+      },
+      {
+        "title": "Unidad 12 - gente e historias",
+        "sections": [
+          {
+            "count": 43
+          }
+        ]
+      }
+    ]
+  },
   "usborne-ftw-es": {
     "id": "usborne-ftw-es",
     "title": "First Thousand Words in Spanish",
