@@ -18,7 +18,8 @@
     "format:check": "oxfmt --check",
     "catalog": "tsx scripts/build-catalog.ts",
     "build:android": "expo prebuild -p android --clean && cd android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a",
-    "test:db": "sh scripts/db-test.sh"
+    "test:db": "sh scripts/db-test.sh",
+    "import:gente": "tsx scripts/import/gente.ts"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",

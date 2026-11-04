@@ -70,6 +70,10 @@ Fixes for source typos live in `FIXES` in `scripts/import/usborne.ts`.
 
 Run `npm run import:dk`. It fetches the Spanish and English `content.json` behind the [DK audio app](https://apps.dk.com/idic/en/audio/es) and joins them by unit and exercise number. Each DK unit becomes a section, and its heading (exercise 0) is also the section's first card. Fixes for misnumbered or blank English entries live in `FIXES` in `scripts/import/dk.ts`.
 
+### Importing: Gente Hoy 1 (SpanishDict)
+
+Run `npm run import:gente`. It reads the `window.SD_COMPONENT_DATA` JSON embedded in the [textbook page](https://www.spanishdict.com/textbooks/26) and each unit's vocabulary list pages. Each unit becomes a chapter, its vocabulary lists become sections (newest first, as the site shows them), and its "Topics" become the chapter's `links`. Word ids are SpanishDict's vocab list entry ids. Images whose URL no longer loads are dropped. Fixes for wrong articles or senses live in `FIXES` in `scripts/import/gente.ts`.
+
 ### Adding a new source
 
 Write `scripts/import/<source>.ts` that outputs a `Book` to `src/data/books/<id>.json` and calls `writeCatalog()`, then add a loader to `LOADERS` in `src/lib/books.ts`. On the web each book is a separate chunk fetched when a deck opens; native bundles them all for offline use. `npm test` fails if `catalog.json` is out of date with the book files.
