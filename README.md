@@ -24,6 +24,27 @@ npm run build:web    # static build in dist/
 
 Pushing to `main` runs CI: typecheck, test, build, then deploy to GitHub Pages.
 
+## Android release APK
+
+Built locally and attached to a GitHub release for sideloading.
+
+1. Bump `version` in `app.json` (x.y.z). `app.config.ts` derives `android.versionCode` from it (`0.3.0` → `300`); Android only installs an update with a higher versionCode.
+2. `npm run build:android` → `android/app/build/outputs/apk/release/app-release.apk` (arm64-v8a + armeabi-v7a, so 32-bit phones can install it too; about 15 MB bigger than arm64-only).
+3. Rename it `vocab-cards-vX.Y.Z.apk` and attach it to the release.
+
+Release APKs are signed with a dedicated keystore kept outside the repo, `~/.android/vocab-cards-release.jks`, configured in `~/.gradle/gradle.properties`:
+
+```properties
+VOCAB_CARDS_STORE_FILE=/Users/<you>/.android/vocab-cards-release.jks
+VOCAB_CARDS_STORE_PASSWORD=...
+VOCAB_CARDS_KEY_ALIAS=vocab-cards
+VOCAB_CARDS_KEY_PASSWORD=...
+```
+
+Without these the build fails rather than produce an unsigned APK. Back up the keystore and passwords: every release must be signed with the same key, or Android refuses to update an installed copy ("App not installed" / signatures do not match). If the key is lost, users must uninstall once (losing local data) and install the new build. v0.1.0 and v0.2.0 were signed with React Native's public debug key, so anyone who has them must uninstall once before installing v0.3.0 or later.
+
+Installing on a phone: open the downloaded APK, allow installs from the browser/Files app when asked, then at the Play Protect "App scan recommended" prompt choose **Scan app** (it reports "looks safe") and **Install**.
+
 ## Data
 
 ```
