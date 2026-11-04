@@ -14,7 +14,7 @@ The source of truth for how the app behaves. Keep it short and high level; updat
 - Home, top to bottom: search, books, starred, learned. Starred and Learned collapse by tapping their title; Learned starts collapsed.
 - Search matches chapter and subtopic names in English or Spanish; inside a book it only searches that book.
 - Chapters show as tiles. Star a chapter to keep it on home; tick it to mark it learned.
-- Settings (gear on home): new words per day for spaced repetition (default 50).
+- Settings (gear on home): new words per day for spaced repetition (default 50), and a colour theme (12 light and dark presets, default Paper) that applies everywhere at once.
 - A book starts with a "Review all" tile: spaced repetition over the whole book.
 
 ## Flashcards

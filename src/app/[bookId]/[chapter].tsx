@@ -1,12 +1,12 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { Deck } from '@/components/Deck';
 import type { SessionDeck } from '@/components/Deck';
 import { bookDeck, chapterDeck, getLoadedBook, loadBook } from '@/lib/books';
 import { chapterSessionIds, reviewSessionIds } from '@/lib/srs';
 import type { Book } from '@/lib/types';
-import { COLORS } from '@/theme';
+import { makeStyles } from '@/theme';
 
 export default function ChapterDeckScreen() {
   const { bookId, chapter, section } = useLocalSearchParams<{
@@ -16,6 +16,7 @@ export default function ChapterDeckScreen() {
   }>();
   // `/<book>/all` is "Review all": spaced repetition over the whole book.
   const all = chapter === 'all';
+  const styles = useStyles();
   const [book, setBook] = useState<Book | null | undefined>(() => getLoadedBook(bookId));
   useEffect(() => {
     if (book) return;
@@ -56,7 +57,7 @@ export default function ChapterDeckScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(theme => ({
   loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  loadingText: { color: COLORS.muted, fontSize: 16 },
-});
+  loadingText: { color: theme.muted, fontSize: 16 },
+}));

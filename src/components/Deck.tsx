@@ -8,7 +8,6 @@ import {
   Modal,
   Platform,
   Pressable,
-  StyleSheet,
   Text,
   useWindowDimensions,
   View,
@@ -43,7 +42,7 @@ import {
 } from '@/lib/srs';
 import type { ProgressMap, Session } from '@/lib/srs';
 import type { Link, Word } from '@/lib/types';
-import { COLORS } from '@/theme';
+import { makeStyles, useTheme } from '@/theme';
 
 const SWIPE_DISTANCE = 40;
 const ROW_HEIGHT = 60;
@@ -110,6 +109,8 @@ export function Deck({
   const viewRef = useRef(view);
   const [panel, setPanel] = useState<'words' | 'links'>();
   const player = useAudioPlayer();
+  const theme = useTheme();
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
 
@@ -327,7 +328,7 @@ export function Deck({
               <Ionicons
                 name="volume-high-outline"
                 size={28}
-                color={COLORS.muted}
+                color={theme.muted}
                 pointerEvents="none"
               />
             ) : null}
@@ -335,7 +336,7 @@ export function Deck({
               <Ionicons
                 name="chevron-back"
                 size={36}
-                color={COLORS.muted}
+                color={theme.muted}
                 pointerEvents="none"
                 style={[styles.arrow, { left: 8 }]}
               />
@@ -344,7 +345,7 @@ export function Deck({
               <Ionicons
                 name="chevron-forward"
                 size={36}
-                color={COLORS.muted}
+                color={theme.muted}
                 pointerEvents="none"
                 style={[styles.arrow, { right: 8 }]}
               />
@@ -361,7 +362,7 @@ export function Deck({
             accessibilityLabel="I know this word: don’t show it again"
             style={[styles.retire, { bottom: insets.bottom + 80 }]}
           >
-            <Ionicons name="checkmark" size={20} color={COLORS.muted} />
+            <Ionicons name="checkmark" size={20} color={theme.muted} />
           </Pressable>
           {session ? (
             <Text style={[styles.status, { bottom: insets.bottom + 84 }]}>
@@ -377,9 +378,15 @@ export function Deck({
                   key={label}
                   onPress={() => onAnswer(label === 'Yes')}
                   accessibilityRole="button"
-                  style={({ pressed }) => [styles.answer, pressed && styles.pressed]}
+                  style={({ pressed }) => [
+                    styles.answer,
+                    label === 'Yes' && styles.yes,
+                    pressed && styles.pressed,
+                  ]}
                 >
-                  <Text style={styles.answerText}>{label}</Text>
+                  <Text style={[styles.answerText, label === 'Yes' && styles.yesText]}>
+                    {label}
+                  </Text>
                 </Pressable>
               ))}
             </View>
@@ -405,7 +412,7 @@ export function Deck({
               accessibilityRole="button"
               accessibilityLabel="Extra material"
             >
-              <Ionicons name="link" size={24} color={COLORS.muted} />
+              <Ionicons name="link" size={24} color={theme.muted} />
             </Pressable>
           ) : null}
           <Pressable
@@ -414,7 +421,7 @@ export function Deck({
             accessibilityRole="button"
             accessibilityLabel="Word list"
           >
-            <Ionicons name="list" size={24} color={COLORS.muted} />
+            <Ionicons name="list" size={24} color={theme.muted} />
           </Pressable>
           {srs ? null : (
             <Text style={styles.chrome}>
@@ -498,7 +505,7 @@ export function Deck({
                         {item.en}
                       </Text>
                     </View>
-                    {retired ? <Ionicons name="checkmark" size={20} color={COLORS.muted} /> : null}
+                    {retired ? <Ionicons name="checkmark" size={20} color={theme.muted} /> : null}
                   </Pressable>
                 );
               }}
@@ -510,8 +517,8 @@ export function Deck({
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.background },
+const useStyles = makeStyles(theme => ({
+  root: { flex: 1, backgroundColor: theme.bg },
   card: {
     flex: 1,
     alignItems: 'center',
@@ -536,22 +543,24 @@ const styles = StyleSheet.create({
   topRight: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   segmented: {
     flexDirection: 'row',
-    backgroundColor: COLORS.surface,
+    backgroundColor: theme.surface,
+    borderWidth: 1,
+    borderColor: theme.border,
     borderRadius: 8,
     padding: 2,
   },
   segment: { paddingVertical: 4, paddingHorizontal: 10, borderRadius: 6 },
-  segmentActive: { backgroundColor: COLORS.text },
-  segmentText: { color: COLORS.muted, fontSize: 13, fontWeight: '600' },
-  segmentTextActive: { color: COLORS.background },
-  chrome: { color: COLORS.muted, fontSize: 18 },
+  segmentActive: { backgroundColor: theme.accent },
+  segmentText: { color: theme.muted, fontSize: 13, fontWeight: '600' },
+  segmentTextActive: { color: theme.onAccent },
+  chrome: { color: theme.muted, fontSize: 18 },
   arrow: { position: 'absolute', top: '50%', marginTop: -18, opacity: 0.6 },
   // Takes whatever height the text leaves, so an image card never overflows a short screen.
   image: { width: '100%', maxWidth: 480, maxHeight: 360, flexGrow: 1, flexShrink: 1, flexBasis: 0 },
-  es: { color: COLORS.text, fontWeight: '600', textAlign: 'center' },
-  en: { color: COLORS.muted, textAlign: 'center' },
-  hint: { color: COLORS.muted, fontSize: 15, textAlign: 'center', opacity: 0.7 },
-  doneTitle: { color: COLORS.text, fontSize: 24, fontWeight: '600', textAlign: 'center' },
+  es: { color: theme.text, fontWeight: '600', textAlign: 'center' },
+  en: { color: theme.muted, textAlign: 'center' },
+  hint: { color: theme.muted, fontSize: 15, textAlign: 'center', opacity: 0.7 },
+  doneTitle: { color: theme.text, fontSize: 24, fontWeight: '600', textAlign: 'center' },
   retire: {
     position: 'absolute',
     right: 20,
@@ -559,7 +568,7 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: COLORS.surface,
+    borderColor: theme.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -567,7 +576,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 60,
     right: 60,
-    color: COLORS.muted,
+    color: theme.muted,
     fontSize: 13,
     textAlign: 'center',
   },
@@ -584,13 +593,17 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 52,
     borderRadius: 10,
-    backgroundColor: COLORS.surface,
+    backgroundColor: theme.surface,
+    borderWidth: 1,
+    borderColor: theme.border,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 4,
   },
-  answerText: { color: COLORS.text, fontSize: 17, fontWeight: '600' },
-  list: { flex: 1, backgroundColor: COLORS.background },
+  answerText: { color: theme.text, fontSize: 17, fontWeight: '600' },
+  yes: { backgroundColor: theme.accent, borderColor: theme.accent },
+  yesText: { color: theme.onAccent },
+  list: { flex: 1, backgroundColor: theme.bg },
   listHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -598,7 +611,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
-  listTitle: { color: COLORS.text, fontSize: 18, fontWeight: '600' },
+  listTitle: { color: theme.text, fontSize: 18, fontWeight: '600' },
   listBody: { width: '100%', maxWidth: 640, alignSelf: 'center' },
   row: {
     height: ROW_HEIGHT,
@@ -608,8 +621,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   rowText: { flex: 1 },
-  rowActive: { backgroundColor: COLORS.surface },
+  rowActive: { backgroundColor: theme.border },
   pressed: { opacity: 0.6 },
-  rowEs: { color: COLORS.text, fontSize: 17, fontWeight: '600' },
-  rowEn: { color: COLORS.muted, fontSize: 14 },
-});
+  rowEs: { color: theme.text, fontSize: 17, fontWeight: '600' },
+  rowEn: { color: theme.muted, fontSize: 14 },
+}));
