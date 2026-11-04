@@ -4,13 +4,14 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { Platform, Pressable, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { syncProfile, useProfile } from '@/lib/prefs';
+import { syncProfile, useImportedBooksSync, useProfile } from '@/lib/prefs';
 import { makeStyles, useTheme, useThemeChoice } from '@/theme';
 
 export default function RootLayout() {
   useEffect(() => {
     syncProfile().catch(console.warn);
   }, []);
+  useImportedBooksSync();
   const { theme, loaded } = useThemeChoice();
   useEffect(() => {
     if (Platform.OS !== 'web' || !loaded) return;

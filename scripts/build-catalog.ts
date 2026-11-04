@@ -1,25 +1,13 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { catalogEntry } from '../src/lib/books.ts';
 import type { Book, Catalog } from '../src/lib/types.ts';
 
 const BOOKS_DIR = 'src/data/books';
 export const CATALOG_PATH = 'src/data/catalog.json';
 
-export function buildCatalog(books: Book[]): Catalog {
-  return Object.fromEntries(
-    books.map(({ chapters, ...book }) => [
-      book.id,
-      {
-        ...book,
-        chapters: chapters.map(c => ({
-          title: c.title,
-          sections: c.sections.map(s => ({ title: s.title, count: s.words.length })),
-          ...(c.links?.length && { links: c.links }),
-        })),
-      },
-    ]),
-  );
-}
+export const buildCatalog = (books: Book[]): Catalog =>
+  Object.fromEntries(books.map(book => [book.id, catalogEntry(book)]));
 
 export const readBooks = (): Book[] =>
   readdirSync(BOOKS_DIR)

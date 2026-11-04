@@ -95,13 +95,17 @@ Run `npm run import:dk`. It fetches the Spanish and English `content.json` behin
 
 Run `npm run import:gente`. It reads the `window.SD_COMPONENT_DATA` JSON embedded in the [textbook page](https://www.spanishdict.com/textbooks/26) and each unit's vocabulary list pages. Each unit becomes a chapter, its vocabulary lists become sections (newest first, as the site shows them), and its "Topics" become the chapter's `links`. Word ids are SpanishDict's vocab list entry ids. Images whose URL no longer loads are dropped. Fixes for wrong articles or senses live in `FIXES` in `scripts/import/gente.ts`.
 
+### Importing: Gente al día 1 (private)
+
+The source is a copyrighted glossary PDF from a paid Campus Difusión account, so the book is never committed or bundled. Run `npm run import:gente-al-dia -- <path to gad1_isbk_glos_EN.pdf>` (needs poppler's `pdftohtml`). It writes `private/gente-al-dia-1.json` (gitignored) with one chapter per unit, each word under its lowest unit tag, and prints per-unit counts and any lines it couldn't parse. Import that file in the app's Settings. Tests use invented entries only.
+
 ### Adding a new source
 
 Write `scripts/import/<source>.ts` that outputs a `Book` to `src/data/books/<id>.json` and calls `writeCatalog()`, then add a loader to `LOADERS` in `src/lib/books.ts`. On the web each book is a separate chunk fetched when a deck opens; native bundles them all for offline use. `npm test` fails if `catalog.json` is out of date with the book files.
 
 ## Profiles backend
 
-Profiles are a name and PIN, not real security. The app signs in with Supabase Auth using `<name>@vocab-cards.local` and a password derived from the PIN. `supabase/migrations/` creates `profiles` (filled by a trigger on sign-up), `topic_marks` and `word_progress`. Row level security lets each signed-in user touch only their own rows, and `anon` gets no table access.
+Profiles are a name and PIN, not real security. The app signs in with Supabase Auth using `<name>@vocab-cards.local` and a password derived from the PIN. `supabase/migrations/` creates `profiles` (filled by a trigger on sign-up), `topic_marks`, `word_progress` and `private_books` (imported book files, one JSON per user and book). Row level security lets each signed-in user touch only their own rows, and `anon` gets no table access.
 
 - **Apply:** the Supabase GitHub integration runs new migrations when they merge to `main`. To apply by hand, paste the migration into the SQL editor or run `psql "<connection string>" -f supabase/migrations/<file>.sql`.
 - **Dashboard step:** in Authentication → Providers → Email, turn off "Confirm email".

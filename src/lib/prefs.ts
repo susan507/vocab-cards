@@ -1,10 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useMemo, useSyncExternalStore } from 'react';
-import { CATALOG, topicFromKey } from './books';
+import { CATALOG, parseBook, setImportedBooks, topicFromKey, useBooks } from './books';
 import { credentials } from './credentials';
 import { forDirection, isProgress, parseProgress, today } from './srs';
 import type { Direction, Progress, ProgressMap, Session } from './srs';
 import { supabase } from './supabase';
+import type { Book } from './types';
 import type { AuthResponse } from '@supabase/supabase-js';
 
 // In-memory mirror of AsyncStorage so every mounted screen sees a change at once.
@@ -224,7 +225,10 @@ function useTopicSet(list: List) {
   const profile = useProfile();
   const storageKey = profile === undefined ? null : scoped(profile, list);
   const raw = usePersisted(storageKey);
+  // Imported books load after start-up, so their topics resolve once they're in.
+  const books = useBooks();
   return useMemo(() => {
+    void books;
     const keys = new Set(parseKeys(raw));
     return {
       topics: [...keys].flatMap(k => topicFromKey(k) ?? []),
@@ -242,13 +246,72 @@ function useTopicSet(list: List) {
         );
       },
     };
-  }, [raw, storageKey, profile, list]);
+  }, [raw, storageKey, profile, list, books]);
 }
 
 export const useStars = () => useTopicSet('stars');
 
 /** Chapters marked as learned. */
 export const useDone = () => useTopicSet('done');
+
+const PRIVATE_BOOKS = 'privateBooks';
+
+const validBooks = (list: unknown): Book[] =>
+  Array.isArray(list) ? list.filter(b => typeof parseBook(b) !== 'string') : [];
+
+const parseBooks = (raw: string | null | undefined) => {
+  try {
+    return validBooks(JSON.parse(raw ?? '[]'));
+  } catch {
+    return [];
+  }
+};
+
+/**
+ * Keeps the books registry in step with the books imported by the current profile (or this
+ * device's guest). A profile's copy is a cache of `private_books`, so they work offline.
+ */
+export function useImportedBooksSync() {
+  const profile = useProfile();
+  const raw = usePersisted(profile === undefined ? null : scoped(profile, PRIVATE_BOOKS));
+  const books = useMemo(() => (raw === undefined ? undefined : parseBooks(raw)), [raw]);
+  useEffect(() => {
+    if (books) setImportedBooks(books);
+  }, [books]);
+  return books;
+}
+
+/** Adds or replaces an imported book; a profile's goes to the server first. Returns an error message or null. */
+export async function importBook(profile: Profile | null, book: Book) {
+  if (profile) {
+    const { error } = await supabase.from('private_books').upsert({
+      user_id: profile.id,
+      book_id: book.id,
+      data: book,
+      updated_at: new Date().toISOString(),
+    });
+    if (error) return `Couldn’t save the book: ${error.message}`;
+  }
+  await updatePersisted(scoped(profile, PRIVATE_BOOKS), prev =>
+    JSON.stringify([...parseBooks(prev).filter(b => b.id !== book.id), book]),
+  );
+  return null;
+}
+
+/** Removes an imported book. Its stars and word progress stay, so importing it again restores them. */
+export async function removeImportedBook(profile: Profile | null, bookId: string) {
+  if (profile) {
+    const { error } = await supabase
+      .from('private_books')
+      .delete()
+      .match({ user_id: profile.id, book_id: bookId });
+    if (error) return `Couldn’t remove the book: ${error.message}`;
+  }
+  await updatePersisted(scoped(profile, PRIVATE_BOOKS), prev =>
+    JSON.stringify(parseBooks(prev).filter(b => b.id !== bookId)),
+  );
+  return null;
+}
 
 export function useCollapsed(section: string, byDefault = false) {
   const [saved, set] = useSetting(`collapsed/${section}`);
@@ -258,12 +321,16 @@ export function useCollapsed(section: string, byDefault = false) {
 
 /** Pulls the profile's marks and settings into its local cache, keeping local order. */
 async function loadProfile(profile: Profile, mergeGuest: boolean) {
-  const [settings, marks] = await Promise.all([
+  const [settings, marks, books] = await Promise.all([
     supabase.from('profiles').select('settings').eq('id', profile.id).maybeSingle(),
     supabase.from('topic_marks').select('kind, topic_key'),
+    supabase.from('private_books').select('data').order('book_id'),
   ]);
   logError(settings);
   logError(marks);
+  logError(books);
+  if (books.data)
+    save(scoped(profile, PRIVATE_BOOKS), JSON.stringify(validBooks(books.data.map(r => r.data))));
   if (settings.data)
     save(scoped(profile, 'settings'), JSON.stringify(toSettings(settings.data.settings)));
   if (marks.error) return;
@@ -315,7 +382,13 @@ async function loadProgress(profile: Profile, mergeGuest: boolean) {
     if (page.data.length < PAGE) break;
   }
   const upload = new Map<string, Progress>();
-  for (const { id } of CATALOG) {
+  const imported = parseBooks(await loadPersisted(scoped(profile, PRIVATE_BOOKS)));
+  const bookIds = new Set([
+    ...CATALOG.map(b => b.id),
+    ...imported.map(b => b.id),
+    ...remote.keys(),
+  ]);
+  for (const id of bookIds) {
     const key = progressKey(profile, id);
     const merged = { ...remote.get(id) };
     const local = [

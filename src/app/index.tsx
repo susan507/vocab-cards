@@ -6,7 +6,7 @@ import { Pressable, ScrollView, Text } from 'react-native';
 import { DownloadControl } from '@/components/DownloadControl';
 import { SearchBox } from '@/components/SearchBox';
 import { Tile, TileGrid, TopicTile, useTileStyles } from '@/components/Tile';
-import { CATALOG, searchTopics, topicKey } from '@/lib/books';
+import { searchTopics, topicKey, useBooks } from '@/lib/books';
 import type { Topic } from '@/lib/books';
 import { useCollapsed, useDone, useStars } from '@/lib/prefs';
 import type { CatalogBook } from '@/lib/types';
@@ -16,7 +16,8 @@ const MAX_RESULTS = 100;
 
 export default function BooksScreen() {
   const [query, setQuery] = useState('');
-  const results = useMemo(() => searchTopics(query), [query]);
+  const books = useBooks();
+  const results = useMemo(() => searchTopics(query, books), [query, books]);
   const { topics: starred } = useStars();
   const { topics: learned } = useDone();
   const tileStyles = useTileStyles();
@@ -34,7 +35,7 @@ export default function BooksScreen() {
         <>
           <Section id="books" title="Books">
             <TileGrid>
-              {CATALOG.map(book => (
+              {books.map(book => (
                 <Tile
                   key={book.id}
                   href={`/${book.id}` as Href}

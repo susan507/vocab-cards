@@ -54,3 +54,6 @@ yarn-error.*
 # Native projects are generated (CNG)
 /android
 /ios
+
+# Private books (copyrighted sources): never commit
+/private/

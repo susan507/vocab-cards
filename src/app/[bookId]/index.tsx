@@ -4,11 +4,11 @@ import { useMemo, useState } from 'react';
 import { ScrollView, Text } from 'react-native';
 import { SearchBox } from '@/components/SearchBox';
 import { Tile, TileGrid, TopicTile, useTileStyles } from '@/components/Tile';
-import { getCatalogBook, searchTopics, topicKey } from '@/lib/books';
+import { searchTopics, topicKey, useBooks } from '@/lib/books';
 
 export default function ChaptersScreen() {
   const { bookId } = useLocalSearchParams<{ bookId: string }>();
-  const book = getCatalogBook(bookId);
+  const book = useBooks().find(b => b.id === bookId);
   const [query, setQuery] = useState('');
   const results = useMemo(() => (book ? searchTopics(query, [book]) : []), [book, query]);
   const tileStyles = useTileStyles();
