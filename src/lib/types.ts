@@ -17,9 +17,13 @@ export type Section = {
   words: Word[];
 };
 
+/** An outside page for extra study, opened in the browser. */
+export type Link = { title: string; url: string };
+
 export type Chapter = {
   title: string;
   sections: Section[];
+  links?: Link[];
 };
 
 export type Book = {
@@ -31,7 +35,11 @@ export type Book = {
 
 /** A book without its words: small enough to bundle eagerly for the home and chapter screens. */
 export type CatalogBook = Omit<Book, 'chapters'> & {
-  chapters: { title: string; sections: { title?: string; count: number }[] }[];
+  chapters: {
+    title: string;
+    sections: { title?: string; count: number }[];
+    links?: Link[];
+  }[];
 };
 
 export type Catalog = Record<string, CatalogBook>;

@@ -14,6 +14,7 @@ export function buildCatalog(books: Book[]): Catalog {
         chapters: chapters.map(c => ({
           title: c.title,
           sections: c.sections.map(s => ({ title: s.title, count: s.words.length })),
+          ...(c.links?.length && { links: c.links }),
         })),
       },
     ]),
