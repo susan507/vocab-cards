@@ -31,7 +31,7 @@ export default function ChapterDeckScreen() {
       </View>
     );
   }
-  return <Deck words={words} onClose={close} />;
+  return <Deck words={words} links={book?.chapters[Number(chapter)]?.links} onClose={close} />;
 }
 
 const styles = StyleSheet.create({

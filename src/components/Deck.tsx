@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   FlatList,
   Image,
+  Linking,
   Modal,
   Platform,
   Pressable,
@@ -20,14 +21,16 @@ import {
 } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { reorderKeeping } from '@/lib/books';
-import { resolveAudio } from '@/lib/offlineAudio';
+import { resolveAudio, resolveImage } from '@/lib/offlineAudio';
 import { ORDERS, useDeckOrder } from '@/lib/prefs';
 import type { Order } from '@/lib/prefs';
-import type { Word } from '@/lib/types';
+import type { Link, Word } from '@/lib/types';
 import { COLORS } from '@/theme';
 
 const SWIPE_DISTANCE = 40;
 const ROW_HEIGHT = 60;
+// Keeps the card clear of the top bar, mirrored below so text stays centred.
+const CHROME_SPACE = 56;
 
 type DeckView = { items: Word[]; index: number; random: boolean };
 
@@ -35,7 +38,15 @@ type DeckView = { items: Word[]; index: number; random: boolean };
  * Full-screen flashcards. Swipe left/right = next/prev, tap = replay audio.
  * `words` is in source order; the saved deck order decides what's shown.
  */
-export function Deck({ words, onClose }: { words: Word[]; onClose: () => void }) {
+export function Deck({
+  words,
+  links,
+  onClose,
+}: {
+  words: Word[];
+  links?: Link[];
+  onClose: () => void;
+}) {
   const [order, setOrder] = useDeckOrder();
   const random = order === 'random';
   const [view, setView] = useState<DeckView>(() => ({
@@ -44,10 +55,10 @@ export function Deck({ words, onClose }: { words: Word[]; onClose: () => void })
   }));
   // Gesture and key handlers read this so they always act on the card on screen.
   const viewRef = useRef(view);
-  const [listOpen, setListOpen] = useState(false);
+  const [panel, setPanel] = useState<'words' | 'links'>();
   const player = useAudioPlayer();
   const insets = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
 
   const show = useCallback((next: DeckView) => {
     viewRef.current = next;
@@ -90,8 +101,8 @@ export function Deck({ words, onClose }: { words: Word[]; onClose: () => void })
   useEffect(() => {
     if (Platform.OS !== 'web') return;
     const onKey = (e: KeyboardEvent) => {
-      if (listOpen) {
-        if (e.key === 'Escape') setListOpen(false);
+      if (panel) {
+        if (e.key === 'Escape') setPanel(undefined);
         return;
       }
       if (e.key === 'ArrowRight') go(1);
@@ -102,7 +113,7 @@ export function Deck({ words, onClose }: { words: Word[]; onClose: () => void })
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [go, play, onClose, listOpen]);
+  }, [go, play, onClose, panel]);
 
   const swipe = usePanGesture({
     runOnJS: true,
@@ -126,14 +137,24 @@ export function Deck({ words, onClose }: { words: Word[]; onClose: () => void })
   const { items, index } = view;
   const word = items[index];
   if (!word) return <View style={styles.root} />;
-  const esSize = Math.min(72, Math.max(32, width * 0.1));
+  // Image cards also size by height so a landscape phone leaves the picture some room.
+  const esSize = Math.min(72, Math.max(32, (word.image ? Math.min(width, height) : width) * 0.1));
 
   return (
     <View style={styles.root}>
       <GestureDetector gesture={gesture}>
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { paddingTop: insets.top + CHROME_SPACE, paddingBottom: insets.bottom + CHROME_SPACE },
+          ]}
+        >
           {word.image ? (
-            <Image source={{ uri: word.image }} style={styles.image} resizeMode="contain" />
+            <Image
+              source={{ uri: resolveImage(word.image) }}
+              style={styles.image}
+              resizeMode="contain"
+            />
           ) : null}
           <Text style={[styles.es, { fontSize: esSize }]}>{word.es}</Text>
           <Text style={[styles.en, { fontSize: esSize * 0.5 }]}>{word.en}</Text>
@@ -193,8 +214,18 @@ export function Deck({ words, onClose }: { words: Word[]; onClose: () => void })
           ))}
         </View>
         <View style={styles.topRight}>
+          {links?.length ? (
+            <Pressable
+              onPress={() => setPanel('links')}
+              hitSlop={12}
+              accessibilityRole="button"
+              accessibilityLabel="Extra material"
+            >
+              <Ionicons name="link" size={24} color={COLORS.muted} />
+            </Pressable>
+          ) : null}
           <Pressable
-            onPress={() => setListOpen(true)}
+            onPress={() => setPanel('words')}
             hitSlop={12}
             accessibilityRole="button"
             accessibilityLabel="Word list"
@@ -206,47 +237,70 @@ export function Deck({ words, onClose }: { words: Word[]; onClose: () => void })
           </Text>
         </View>
       </View>
-      <Modal visible={listOpen} animationType="fade" onRequestClose={() => setListOpen(false)}>
+      <Modal
+        visible={panel !== undefined}
+        animationType="fade"
+        onRequestClose={() => setPanel(undefined)}
+      >
         <View style={[styles.list, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
           <View style={styles.listHeader}>
-            <Text style={styles.listTitle}>Words</Text>
+            <Text style={styles.listTitle}>{panel === 'links' ? 'Extra material' : 'Words'}</Text>
             <Pressable
-              onPress={() => setListOpen(false)}
+              onPress={() => setPanel(undefined)}
               hitSlop={16}
               accessibilityRole="button"
-              accessibilityLabel="Close word list"
+              accessibilityLabel="Close list"
             >
               <Text style={styles.chrome}>✕</Text>
             </Pressable>
           </View>
-          <FlatList
-            data={items}
-            keyExtractor={(_, i) => String(i)}
-            getItemLayout={(_, i) => ({ length: ROW_HEIGHT, offset: ROW_HEIGHT * i, index: i })}
-            initialScrollIndex={Math.max(0, index - 2)}
-            style={styles.listBody}
-            renderItem={({ item, index: i }) => (
-              <Pressable
-                onPress={() => {
-                  setListOpen(false);
-                  goTo(i);
-                }}
-                accessibilityRole="button"
-                style={({ pressed }) => [
-                  styles.row,
-                  i === index && styles.rowActive,
-                  pressed && styles.pressed,
-                ]}
-              >
-                <Text style={styles.rowEs} numberOfLines={1}>
-                  {item.es}
-                </Text>
-                <Text style={styles.rowEn} numberOfLines={1}>
-                  {item.en}
-                </Text>
-              </Pressable>
-            )}
-          />
+          {panel === 'links' ? (
+            <FlatList
+              data={links}
+              keyExtractor={(_, i) => String(i)}
+              style={styles.listBody}
+              renderItem={({ item }) => (
+                <Pressable
+                  onPress={() => Linking.openURL(item.url).catch(() => {})}
+                  accessibilityRole="link"
+                  style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+                >
+                  <Text style={styles.rowEs} numberOfLines={2}>
+                    {item.title}
+                  </Text>
+                </Pressable>
+              )}
+            />
+          ) : (
+            <FlatList
+              data={items}
+              keyExtractor={(_, i) => String(i)}
+              getItemLayout={(_, i) => ({ length: ROW_HEIGHT, offset: ROW_HEIGHT * i, index: i })}
+              initialScrollIndex={Math.max(0, index - 2)}
+              style={styles.listBody}
+              renderItem={({ item, index: i }) => (
+                <Pressable
+                  onPress={() => {
+                    setPanel(undefined);
+                    goTo(i);
+                  }}
+                  accessibilityRole="button"
+                  style={({ pressed }) => [
+                    styles.row,
+                    i === index && styles.rowActive,
+                    pressed && styles.pressed,
+                  ]}
+                >
+                  <Text style={styles.rowEs} numberOfLines={1}>
+                    {item.es}
+                  </Text>
+                  <Text style={styles.rowEn} numberOfLines={1}>
+                    {item.en}
+                  </Text>
+                </Pressable>
+              )}
+            />
+          )}
         </View>
       </Modal>
     </View>
@@ -288,7 +342,8 @@ const styles = StyleSheet.create({
   segmentTextActive: { color: COLORS.background },
   chrome: { color: COLORS.muted, fontSize: 18 },
   arrow: { position: 'absolute', top: '50%', marginTop: -18, opacity: 0.6 },
-  image: { width: '60%', height: '30%' },
+  // Takes whatever height the text leaves, so an image card never overflows a short screen.
+  image: { width: '100%', maxWidth: 480, maxHeight: 360, flexGrow: 1, flexShrink: 1, flexBasis: 0 },
   es: { color: COLORS.text, fontWeight: '600', textAlign: 'center' },
   en: { color: COLORS.muted, textAlign: 'center' },
   list: { flex: 1, backgroundColor: COLORS.background },

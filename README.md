@@ -35,7 +35,7 @@ src/lib/types.ts          the Book → Chapter → Section → Word format
 src/lib/books.ts          book registry, catalog, search and deck builders
 ```
 
-The app only ever reads `Book` JSON (see `src/lib/types.ts`). Each word has a stable `id` (unique within its book; `wordKey` makes the global key), `es`, `en`, an optional `audio` URL and an optional `image`. Chapters keep the source's order. A chapter without subtopics has a single section with no title.
+The app only ever reads `Book` JSON (see `src/lib/types.ts`). Each word has a stable `id` (unique within its book; `wordKey` makes the global key), `es`, `en`, an optional `audio` URL and an optional `image` URL (shown above the Spanish). A chapter can list `links` to outside pages, opened from the deck's link button. Native offline downloads fetch both audio and images. Chapters keep the source's order. A chapter without subtopics has a single section with no title.
 
 Audio is not committed. The web version streams it from the source URL, and the native app will download it on the device for offline use.
 
@@ -91,4 +91,3 @@ Profiles are a name and PIN, not real security. The app signs in with Supabase A
 - Native app with offline audio (downloaded with `expo-file-system`)
 - Spaced repetition: mark each word as known or unknown
 - Review modes: shuffle, and pick one, several or all chapters. The card screen already takes a plain `Word[]` deck, so these only need new deck builders.
-- Images on cards (`Word.image` is already rendered when present)

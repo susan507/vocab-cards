@@ -40,9 +40,26 @@ export function chapterDeck(book: Book, chapter: number, section?: number): Word
   );
 }
 
-export const chapterAudio = (book: Book, chapter: number) => [
-  ...new Set(chapterDeck(book, chapter).flatMap(w => w.audio ?? [])),
+export const chapterMedia = (book: Book, chapter: number, kind: 'audio' | 'image') => [
+  ...new Set(chapterDeck(book, chapter).flatMap(w => w[kind] ?? [])),
 ];
+
+/** Collision-safe local name for a downloaded file: a hash of the whole URL, keeping its extension. */
+export function mediaFileName(url: string): string {
+  // cyrb53
+  let h1 = 0xdeadbeef;
+  let h2 = 0x41c6ce57;
+  for (let i = 0; i < url.length; i++) {
+    const ch = url.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  const hash = (4294967296 * (h2 & 0x1fffff) + (h1 >>> 0)).toString(36);
+  const ext = /\.[a-z0-9]{2,5}$/i.exec(url.split(/[?#]/)[0].split('/').pop() ?? '')?.[0] ?? '';
+  return hash + ext.toLowerCase();
+}
 
 export function shuffle<T>(items: readonly T[]): T[] {
   const out = [...items];
