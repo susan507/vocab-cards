@@ -307,7 +307,7 @@ export function Deck({
   const rounds = review ? review.drill : session;
   const word = wordOf(view);
   const srsReady = srs && view.order === 'srs';
-  if (!word && !srsReady) return <View style={styles.root} />;
+  if (!word && !srsReady) return <View style={styles.root} nativeID="deck" />;
   // Image cards also size by height so a landscape phone leaves the picture some room.
   const esSize = word
     ? Math.min(72, Math.max(32, (word.image ? Math.min(width, height) : width) * 0.1))
@@ -358,7 +358,7 @@ export function Deck({
   );
 
   return (
-    <View style={styles.root}>
+    <View style={styles.root} nativeID="deck">
       {!word ? (
         <View
           style={[
@@ -670,17 +670,22 @@ function CaughtUp({
 }
 
 const useStyles = makeStyles(theme => ({
-  root: { flex: 1, backgroundColor: theme.bg },
+  // Web: nothing on the deck is selectable. A selection would pop up the phone's lookup, and
+  // react-native-web cancels a press when the selection changes during it, so the Yes/No tap
+  // that cleared a selection would be lost. index.html also turns off callouts and tap highlights.
+  root: {
+    flex: 1,
+    backgroundColor: theme.bg,
+    ...(Platform.OS === 'web' ? ({ userSelect: 'none' } as object) : null),
+  },
   card: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
     gap: 24,
-    // Web: no text selection or browser panning while swiping.
-    ...(Platform.OS === 'web'
-      ? ({ userSelect: 'none', touchAction: 'none', cursor: 'pointer' } as object)
-      : null),
+    // Web: no browser panning while swiping.
+    ...(Platform.OS === 'web' ? ({ touchAction: 'none', cursor: 'pointer' } as object) : null),
   },
   topBar: {
     position: 'absolute',

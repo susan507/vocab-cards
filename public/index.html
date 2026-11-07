@@ -17,6 +17,14 @@
         overscroll-behavior: none;
         background: var(--bg, #fafaf7);
       }
+      /* The flashcard screen: taps are only for audio, reveal and buttons, never text selection or lookups. */
+      #deck,
+      #deck * {
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+      }
       #root {
         display: flex;
         height: 100%;
