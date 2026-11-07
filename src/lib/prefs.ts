@@ -1,9 +1,18 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useCallback, useEffect, useMemo, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { CATALOG, parseBook, setImportedBooks, topicFromKey, useBooks } from './books';
 import { credentials } from './credentials';
-import { forDirection, isProgress, parseProgress } from './srs';
-import type { Direction, Progress, ProgressMap, Review, Session } from './srs';
+import {
+  asSaved,
+  forDirection,
+  isProgress,
+  newestSaved,
+  parseProgress,
+  parseSaved,
+  sameSaved,
+  toSaved,
+} from './srs';
+import type { Direction, Progress, ProgressMap, Review, Saved, Session } from './srs';
 import { supabase } from './supabase';
 import type { Book } from './types';
 import type { AuthResponse } from '@supabase/supabase-js';
@@ -134,19 +143,76 @@ export function useDirection() {
   return [dir, (next: Direction) => set(next)] as const;
 }
 
-/** The raw in-progress spaced-repetition session (or "Review all" state) for a deck and direction; device only. */
+const pushSession = (profile: Profile, sessionKey: string, saved: Saved) =>
+  supabase
+    .from('study_sessions')
+    .upsert({
+      user_id: profile.id,
+      session_key: sessionKey,
+      data: saved,
+      updated_at: saved.updatedAt,
+    })
+    .then(logError);
+
+/** Keeps the newest of the local copy and `remote` on both sides. */
+async function mergeSession(profile: Profile, sessionKey: string, remote: Saved | null) {
+  const key = scoped(profile, sessionKey);
+  const local = parseSaved(await loadPersisted(key));
+  const keep = newestSaved(local, remote);
+  if (keep === remote) {
+    if (remote) save(key, JSON.stringify(remote));
+  } else if (keep && keep.updatedAt !== remote?.updatedAt)
+    await pushSession(profile, sessionKey, keep);
+}
+
+const PULL_TIMEOUT_MS = 3000;
+
+/** Fetches one session's row; gives up after PULL_TIMEOUT_MS (offline) and the local copy is used. */
+async function pullSession(profile: Profile, sessionKey: string) {
+  const timeout = new Promise<null>(resolve => setTimeout(() => resolve(null), PULL_TIMEOUT_MS));
+  const row = supabase
+    .from('study_sessions')
+    .select('data')
+    .eq('session_key', sessionKey)
+    .maybeSingle()
+    .then(async result => {
+      if (result.error) return logError(result);
+      await mergeSession(profile, sessionKey, asSaved(result.data?.data));
+    });
+  await Promise.race([row, timeout]);
+}
+
+/**
+ * The raw saved spaced-repetition session (or "Review all" state) for a deck and direction, in the
+ * `Saved` envelope. Signed in, it's synced with `study_sessions`: pulled each time the deck opens
+ * (undefined until then) and written through on every save.
+ */
 export function useSavedSession(deckKey: string, dir: Direction) {
   const profile = useProfile();
-  const key =
-    profile === undefined ? null : scoped(profile, forDirection(`session/${deckKey}`, dir));
+  const sessionKey = forDirection(`session/${deckKey}`, dir);
+  const key = profile === undefined ? null : scoped(profile, sessionKey);
+  const [pulled, setPulled] = useState<string | null>(null);
+  useEffect(() => {
+    if (!profile || key === null) return;
+    let live = true;
+    pullSession(profile, sessionKey)
+      .catch(console.warn)
+      .finally(() => live && setPulled(key));
+    return () => {
+      live = false;
+    };
+  }, [profile, key, sessionKey]);
   const raw = usePersisted(key);
   const set = useCallback(
     (session: Session | Review | null) => {
-      if (key !== null) save(key, JSON.stringify(session));
+      if (key === null || sameSaved(parseSaved(cache.get(key)), session)) return;
+      const saved = toSaved(session, new Date());
+      save(key, JSON.stringify(saved));
+      if (profile) pushSession(profile, sessionKey, saved);
     },
-    [key],
+    [key, profile, sessionKey],
   );
-  return [raw, set] as const;
+  return [profile && pulled !== key ? undefined : raw, set] as const;
 }
 
 const progressKey = (profile: Profile | null, bookId: string) =>
@@ -328,7 +394,18 @@ async function loadProfile(profile: Profile, mergeGuest: boolean) {
     const local = parseKeys(await loadPersisted(key)).filter(k => remote.has(k));
     save(key, JSON.stringify([...new Set([...local, ...remote])]));
   }
-  await loadProgress(profile, mergeGuest);
+  await Promise.all([loadProgress(profile, mergeGuest), loadSessions(profile)]);
+}
+
+/** Merges every saved session of the profile with the local copies (decks also pull theirs on open). */
+async function loadSessions(profile: Profile) {
+  const { data, error } = await supabase.from('study_sessions').select('session_key, data');
+  if (error) return logError({ error });
+  await Promise.all(
+    (data as { session_key: string; data: unknown }[]).map(row =>
+      mergeSession(profile, row.session_key, asSaved(row.data)),
+    ),
+  );
 }
 
 const PAGE = 1000;

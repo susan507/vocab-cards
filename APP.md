@@ -24,6 +24,7 @@ The source of truth for how the app behaves. Keep it short and high level; updat
 - Direction: Spanish → English (default) or English → Spanish, one setting for every chapter and mode, kept per profile.
 - Audio (Spanish) plays once when a word appears; tapping anywhere replays it. Except in English → Spanish spaced repetition, where it waits for the reveal tap. Words without a recording are read out by the device's Spanish text-to-speech.
 - Arrows and an audio icon hint at swiping and tapping; they don't do anything themselves.
+- Nothing on the flashcard screen can be selected (no text selection or lookup pop-ups), so taps only replay, reveal or press buttons, and No/Yes always answer on the first tap.
 - Top bar: close, mode, direction, word list (jump to any word), extra material links when the chapter has them, position.
 - Modes:
   - In order: swipe left/right for next/previous.
@@ -37,7 +38,8 @@ The source of truth for how the app behaves. Keep it short and high level; updat
 - The picture would give the answer away in Spanish → English, so it appears with the English on reveal; in English → Spanish it shows from the start.
 - Each direction is a separate deck: its own boxes, retired words, saved session and tile freshness bars. Progress from before directions counts as Spanish → English.
 - A session runs in rounds, each shuffled. Round 1 is the whole session deck; every answer goes on a Yes or No pile. The next round is the latest No pile, until a round has no No. Then the words missed in round 1 are revised the same way until each gets a Yes. Yes words don't come back in that session. The round and pile sizes show during a session; when it's over, the session says so.
-- An unfinished session resumes after closing or reloading, the same day only, once at least one card has been answered; an untouched one is rebuilt with the current rules.
+- An unfinished session resumes after closing or reloading, the same day only, once at least one card has been answered; an untouched one, or one saved by an older app version, is rebuilt with the current rules (word progress is kept).
+- Signed in, sessions in progress (chapter sessions and the "Review all" state, per direction) sync across devices: start on the phone, carry on on the laptop. Opening a deck fetches its latest save, and the most recent save wins, including finishing a session elsewhere. Offline, the device's own copy is used. Guests keep sessions on the device.
 - Leitner boxes: box n comes back every 2^(n-1) calendar days (box 7, every 64 days, is the top). A word's "how overdue" is the days since its last answer ÷ its box interval; 1 or more is due.
 - Only a word's first answer of the day (in any session) moves its box; re-drills later that day don't. No → box 1. Yes → up one box, or further when it was remembered after a long gap (to the largest box whose interval fits the gap: box 2 last seen 10 days ago goes to box 4). A never-seen word goes to box 2 on Yes, box 1 on No.
 - Chapter session: the chapter's (or subtopic's) due and box-1 words, most overdue first, then never-seen words in book order. A fresh chapter is the whole chapter; coming back the same day gives just the words answered No.
