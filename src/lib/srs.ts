@@ -221,6 +221,10 @@ export type Session = {
 
 type Mix = (ids: readonly string[]) => string[];
 
+/** Saved but never answered: safe to rebuild with the current deck rules. */
+export const isUntouched = (s: Session) =>
+  s.stage === 'main' && s.round === 1 && !s.yes.length && !s.no.length;
+
 export const startSession = (ids: readonly string[], day: string, mix: Mix = shuffle): Session =>
   nextRound({ day, stage: 'main', round: 0, queue: [], yes: [], no: [...ids], missed: [] }, mix);
 

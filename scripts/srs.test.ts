@@ -11,6 +11,7 @@ import {
   dueSessionIds,
   forDirection,
   isDue,
+  isUntouched,
   nextDueIn,
   openReview,
   parseReview,
@@ -367,4 +368,11 @@ test('directions are separate decks; legacy keys read as ES→EN', () => {
   // Saved sessions and review state live under per-direction keys.
   assert.equal(forDirection('session/b/all', 'esEn'), 'session/b/all');
   assert.notEqual(forDirection('session/b/all', 'enEs'), forDirection('session/b/all', 'esEn'));
+});
+
+test('an unanswered saved session counts as untouched; any answer makes it real', () => {
+  const s = startSession(['a', 'b', 'c'], '2026-11-07', ids => [...ids]);
+  assert.equal(isUntouched(s), true);
+  assert.equal(isUntouched(answer(s, true)), false);
+  assert.equal(isUntouched(answer(s, false)), false);
 });
