@@ -25,6 +25,7 @@ The source of truth for how the app behaves. Keep it short and high level; updat
 - Audio (Spanish) plays once when a word appears; tapping anywhere replays it. Except in English → Spanish spaced repetition, where it waits for the reveal tap. Words without a recording are read out by the device's Spanish text-to-speech.
 - Arrows and an audio icon hint at swiping and tapping; they don't do anything themselves.
 - Nothing on the flashcard screen can be selected (no text selection or lookup pop-ups), so taps only replay, reveal or press buttons, and No/Yes always answer on the first tap.
+- Tapping the big word (whichever language is on top) also copies it to the clipboard, to look it up elsewhere; "Copied" shows briefly. It still isn't selectable.
 - Top bar: close, mode, direction, word list (jump to any word), extra material links when the chapter has them, position.
 - Modes:
   - In order: swipe left/right for next/previous.

@@ -1,7 +1,9 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
+import * as Clipboard from 'expo-clipboard';
 import * as Speech from 'expo-speech';
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
+import type { LayoutRectangle } from 'react-native';
 import {
   FlatList,
   Image,
@@ -123,6 +125,11 @@ export function Deck({
   // Gesture and key handlers read this so they always act on the card on screen.
   const viewRef = useRef(view);
   const [panel, setPanel] = useState<'words' | 'links'>();
+  // The big word copies on tap without being selectable: a selection would trigger the browser's lookup.
+  const bigWordRect = useRef<LayoutRectangle | null>(null);
+  const [copied, setCopied] = useState(false);
+  const copiedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(copiedTimer.current), []);
   const player = useAudioPlayer();
   const theme = useTheme();
   const styles = useStyles();
@@ -298,7 +305,25 @@ export function Deck({
   const tap = useTapGesture({
     runOnJS: true,
     onDeactivate: e => {
-      if (!e.canceled) reveal();
+      if (e.canceled) return;
+      const rect = bigWordRect.current;
+      const word = wordOf(viewRef.current);
+      if (
+        word &&
+        rect &&
+        e.x >= rect.x &&
+        e.x <= rect.x + rect.width &&
+        e.y >= rect.y &&
+        e.y <= rect.y + rect.height
+      ) {
+        Clipboard.setStringAsync(viewRef.current.dir === 'esEn' ? word.es : word.en).catch(
+          () => {},
+        );
+        setCopied(true);
+        clearTimeout(copiedTimer.current);
+        copiedTimer.current = setTimeout(() => setCopied(false), 1200);
+      }
+      reveal();
     },
   });
   const gesture = useExclusiveGestures(swipe, tap);
@@ -393,7 +418,12 @@ export function Deck({
                 resizeMode="contain"
               />
             ) : null}
-            <Text style={[styles.es, { fontSize: esSize }]}>
+            <Text
+              style={[styles.es, { fontSize: esSize }]}
+              onLayout={e => {
+                bigWordRect.current = e.nativeEvent.layout;
+              }}
+            >
               {dir === 'esEn' ? word.es : word.en}
             </Text>
             {srs && !revealed ? (
@@ -412,6 +442,11 @@ export function Deck({
               color={theme.muted}
               pointerEvents="none"
             />
+            {copied ? (
+              <Text style={[styles.copied, { top: topSpace }]} pointerEvents="none">
+                Copied
+              </Text>
+            ) : null}
             {index > 0 && !srs ? (
               <Ionicons
                 name="chevron-back"
@@ -716,6 +751,7 @@ const useStyles = makeStyles(theme => ({
   // Takes whatever height the text leaves, so an image card never overflows a short screen.
   image: { width: '100%', maxWidth: 480, maxHeight: 360, flexGrow: 1, flexShrink: 1, flexBasis: 0 },
   hidden: { opacity: 0 },
+  copied: { position: 'absolute', color: theme.muted, fontSize: 14 },
   es: { color: theme.text, fontWeight: '600', textAlign: 'center' },
   en: { color: theme.muted, textAlign: 'center' },
   hint: { color: theme.muted, fontSize: 15, textAlign: 'center', opacity: 0.7 },
