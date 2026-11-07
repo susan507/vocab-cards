@@ -1,10 +1,8 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { Deck } from '@/components/Deck';
-import type { SessionDeck } from '@/components/Deck';
 import { bookDeck, chapterDeck, getLoadedBook, loadBook } from '@/lib/books';
-import { chapterSessionIds, reviewSessionIds } from '@/lib/srs';
 import type { Book } from '@/lib/types';
 import { makeStyles } from '@/theme';
 
@@ -29,13 +27,6 @@ export default function ChapterDeckScreen() {
     if (all) return bookDeck(book);
     return chapterDeck(book, Number(chapter), section === undefined ? undefined : Number(section));
   }, [book, all, chapter, section]);
-  const sessionDeck = useCallback<SessionDeck>(
-    (progress, newLeft, day, dir) =>
-      all
-        ? reviewSessionIds(words, bookId, progress, newLeft, day, dir)
-        : chapterSessionIds(words, bookId, progress, dir),
-    [all, words, bookId],
-  );
   const close = () => (router.canGoBack() ? router.back() : router.replace(`/${bookId}`));
   if (book === undefined) {
     return (
@@ -49,7 +40,7 @@ export default function ChapterDeckScreen() {
       words={words}
       bookId={bookId}
       sessionKey={all ? `${bookId}/all` : [bookId, chapter, section].filter(Boolean).join('/')}
-      sessionDeck={sessionDeck}
+      review={all}
       links={all ? undefined : book?.chapters[Number(chapter)]?.links}
       mode={all ? 'srs' : undefined}
       onClose={close}

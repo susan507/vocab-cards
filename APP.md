@@ -15,7 +15,7 @@ The source of truth for how the app behaves. Keep it short and high level; updat
 - Home, top to bottom: search, books, starred, learned. Starred and Learned collapse by tapping their title; Learned starts collapsed.
 - Search matches chapter and subtopic names in English or Spanish; inside a book it only searches that book.
 - Chapters show as tiles, the same on home and in a book: word count, extra-material and download icons on one line. Star a chapter to keep it on home; tick it to mark it learned.
-- Settings (gear on home): new words per day for spaced repetition (default 50), imported books, and a colour theme (12 light and dark presets, default Paper) that applies everywhere at once.
+- Settings (gear on home): imported books and a colour theme (12 light and dark presets, default Paper) that applies everywhere at once.
 - A book starts with a "Review all" tile: spaced repetition over the whole book.
 
 ## Flashcards
@@ -35,12 +35,14 @@ The source of truth for how the app behaves. Keep it short and high level; updat
 - Leitner-style Yes/No piles, like studying with physical cards.
 - The card shows the prompt side; tap to reveal the other side, then answer No or Yes. No swiping.
 - The picture would give the answer away in Spanish → English, so it appears with the English on reveal; in English → Spanish it shows from the start.
-- Each direction is a separate deck: its own boxes, retired words, daily new-word allowance, saved session and tile freshness bars. Progress from before directions counts as Spanish → English.
+- Each direction is a separate deck: its own boxes, retired words, saved session and tile freshness bars. Progress from before directions counts as Spanish → English.
 - A session runs in rounds, each shuffled. Round 1 is the whole session deck; every answer goes on a Yes or No pile. The next round is the latest No pile, until a round has no No. Then the words missed in round 1 are revised the same way until each gets a Yes. Yes words don't come back in that session. The round and pile sizes show during a session; when it's over, the session says so.
 - An unfinished session resumes after closing or reloading, the same day only.
-- Chapter session: every word in the chapter (or subtopic), every time.
-- "Review all" session: Leitner boxes over the whole book. Words due today plus never-seen words (taken in book order), with new words capped per day by the setting (counted across sessions).
-- Only round-1 answers (in any session) move boxes: Yes up one box (a new word counts as box 1), No back to box 1. Box n comes back every 2^(n-1) calendar days (box 7, every 64 days, is the top).
+- Leitner boxes: box n comes back every 2^(n-1) calendar days (box 7, every 64 days, is the top). A word's "how overdue" is the days since its last answer ÷ its box interval; 1 or more is due.
+- Only a word's first answer of the day (in any session) moves its box; re-drills later that day don't. No → box 1. Yes → up one box, or further when it was remembered after a long gap (to the largest box whose interval fits the gap: box 2 last seen 10 days ago goes to box 4). A never-seen word goes to box 2 on Yes, box 1 on No.
+- Chapter session: the chapter's (or subtopic's) due and box-1 words, most overdue first, then never-seen words in book order. A fresh chapter is the whole chapter; coming back the same day gives just the words answered No.
+- Nothing due in a chapter: "All caught up", roughly when the next word is due, and two ways to study anyway: the ~20 shakiest words (lowest boxes, most overdue first) or the whole chapter.
+- "Review all": one ongoing queue of every word already studied in the book (no new words), most overdue first, re-sorted each time it's opened; stop whenever. Yes takes a word out for today; No puts it on a No pile. At 10 words, or on tapping "Drill No pile", the pile is drilled in shuffled rounds until each word gets a Yes, then the queue carries on. The pile and progress through the queue survive leaving or reloading, the same day. When the queue runs out: "All caught up".
 - The ✓ on the card retires a word: it's left out of every session. Retired words show ✓ in the word list; tapping restores them. Both apply to the current direction.
 - No due counts on home or tiles. A chapter tile shows nothing until its words have been studied; after that a bar shows how fresh they are, full just after studying and shrinking until they're due.
 

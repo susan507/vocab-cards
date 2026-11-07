@@ -2,8 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useMemo, useSyncExternalStore } from 'react';
 import { CATALOG, parseBook, setImportedBooks, topicFromKey, useBooks } from './books';
 import { credentials } from './credentials';
-import { forDirection, isProgress, parseProgress, today } from './srs';
-import type { Direction, Progress, ProgressMap, Session } from './srs';
+import { forDirection, isProgress, parseProgress } from './srs';
+import type { Direction, Progress, ProgressMap, Review, Session } from './srs';
 import { supabase } from './supabase';
 import type { Book } from './types';
 import type { AuthResponse } from '@supabase/supabase-js';
@@ -134,42 +134,14 @@ export function useDirection() {
   return [dir, (next: Direction) => set(next)] as const;
 }
 
-export const DEFAULT_NEW_PER_DAY = 50;
-
-export function useNewPerDay() {
-  const [saved, set] = useSetting('newPerDay');
-  const n = Number.parseInt(saved ?? '', 10);
-  return [
-    Number.isFinite(n) && n >= 0 ? n : DEFAULT_NEW_PER_DAY,
-    (next: number) => set(String(next)),
-  ] as const;
-}
-
-/** New words started today in `dir`. Kept on the device only, so another device has its own allowance. */
-export function useNewToday(dir: Direction) {
-  const profile = useProfile();
-  const key = profile === undefined ? null : scoped(profile, forDirection('newToday', dir));
-  const raw = usePersisted(key);
-  const count = (r: string | null | undefined) => {
-    const [day, n] = (r ?? '').split(' ');
-    return day === today() ? Number(n) || 0 : 0;
-  };
-  return {
-    count: raw === undefined ? undefined : count(raw),
-    increment: () => {
-      if (key) updatePersisted(key, prev => `${today()} ${count(prev) + 1}`);
-    },
-  };
-}
-
-/** The raw in-progress spaced-repetition session for a deck and direction (parse with `parseSession`); device only. */
+/** The raw in-progress spaced-repetition session (or "Review all" state) for a deck and direction; device only. */
 export function useSavedSession(deckKey: string, dir: Direction) {
   const profile = useProfile();
   const key =
     profile === undefined ? null : scoped(profile, forDirection(`session/${deckKey}`, dir));
   const raw = usePersisted(key);
   const set = useCallback(
-    (session: Session | null) => {
+    (session: Session | Review | null) => {
       if (key !== null) save(key, JSON.stringify(session));
     },
     [key],
