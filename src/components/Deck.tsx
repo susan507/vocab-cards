@@ -59,7 +59,7 @@ const ROW_HEIGHT = 60;
 // Keeps the card clear of the top bar, mirrored below so text stays centred.
 const CHROME_SPACE = 56;
 const MODE_ROW = 40;
-// Room for the round line, the Yes/No buttons and the retire control under a spaced-repetition card.
+// Room for the round line and the Yes/No buttons under a spaced-repetition card.
 const ANSWER_SPACE = 136;
 
 // `order` is null until the spaced-repetition session is ready (progress still loading).
@@ -470,15 +470,6 @@ export function Deck({
       )}
       {srs && word ? (
         <>
-          <Pressable
-            onPress={retire}
-            hitSlop={12}
-            accessibilityRole="button"
-            accessibilityLabel="I know this word: don’t show it again"
-            style={[styles.retire, { bottom: insets.bottom + 80 }]}
-          >
-            <Ionicons name="checkmark" size={20} color={theme.muted} />
-          </Pressable>
           {review && !review.drill ? (
             review.pile.length ? (
               <Pressable
@@ -537,6 +528,18 @@ export function Deck({
         </Pressable>
         {narrow ? <View /> : toggles}
         <View style={styles.topRight}>
+          {/* Up here, away from the thumb's path to Yes/No, so a word is never retired by accident. */}
+          {srs && word ? (
+            <Pressable
+              onPress={retire}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="I know this word: don’t show it again"
+              style={styles.retire}
+            >
+              <Ionicons name="checkmark" size={20} color={theme.muted} />
+            </Pressable>
+          ) : null}
           {links?.length ? (
             <Pressable
               onPress={() => setPanel('links')}
@@ -757,8 +760,6 @@ const useStyles = makeStyles(theme => ({
   hint: { color: theme.muted, fontSize: 15, textAlign: 'center', opacity: 0.7 },
   doneTitle: { color: theme.text, fontSize: 24, fontWeight: '600', textAlign: 'center' },
   retire: {
-    position: 'absolute',
-    right: 20,
     width: 32,
     height: 32,
     borderRadius: 16,

@@ -46,7 +46,7 @@ The source of truth for how the app behaves. Keep it short and high level; updat
 - Chapter session: the chapter's (or subtopic's) due and box-1 words, most overdue first, then never-seen words in book order. A fresh chapter is the whole chapter; coming back the same day gives just the words answered No.
 - Nothing due in a chapter: "All caught up", roughly when the next word is due, and two ways to study anyway: the ~20 shakiest words (lowest boxes, most overdue first) or the whole chapter.
 - "Review all": one ongoing queue of every word already studied in the book (no new words), most overdue first, re-sorted each time it's opened; stop whenever. Yes takes a word out for today; No puts it on a No pile. At 10 words, or on tapping "Drill No pile", the pile is drilled in shuffled rounds until each word gets a Yes, then the queue carries on. The pile and progress through the queue survive leaving or reloading, the same day. When the queue runs out: "All caught up".
-- The ✓ on the card retires a word: it's left out of every session. Retired words show ✓ in the word list; tapping restores them. Both apply to the current direction.
+- The ✓ in the card's top bar retires a word: it's left out of every session. Retired words show ✓ in the word list; tapping restores them. Both apply to the current direction.
 - No due counts on home or tiles. A chapter tile shows nothing until its words have been studied; after that a bar shows how fresh they are, full just after studying and shrinking until they're due.
 
 ## Profiles
