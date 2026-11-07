@@ -35,6 +35,7 @@ import {
   nextDueIn,
   openReview,
   parseReview,
+  isUntouched,
   parseSession,
   progressKey,
   removeFromReview,
@@ -194,7 +195,8 @@ export function Deck({
       saveSession(review);
       next = { ...current, order, dir, ...NO_SRS, review };
     } else {
-      const saved = parseSession(savedSession, day);
+      const parsed = parseSession(savedSession, day);
+      const saved = parsed && !isUntouched(parsed) ? parsed : null;
       const ids = saved ? [] : dueSessionIds(words, bookId, progress, day, dir);
       const session = saved ?? startSession(ids, day);
       saveSession(session.queue.length ? session : null);
