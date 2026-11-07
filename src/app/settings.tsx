@@ -1,37 +1,18 @@
 import * as DocumentPicker from 'expo-document-picker';
 import { File as FsFile } from 'expo-file-system';
 import { useState } from 'react';
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useTileStyles } from '@/components/Tile';
 import { isBundled, parseBook, useBooks } from '@/lib/books';
-import { importBook, removeImportedBook, useNewPerDay, useProfile } from '@/lib/prefs';
+import { importBook, removeImportedBook, useProfile } from '@/lib/prefs';
 import { makeStyles, THEMES, useThemeChoice } from '@/theme';
 
 export default function SettingsScreen() {
-  const [newPerDay, setNewPerDay] = useNewPerDay();
-  const [text, setText] = useState<string>();
   const { theme: current, set: setTheme } = useThemeChoice();
   const styles = useStyles();
   const tileStyles = useTileStyles();
   return (
     <ScrollView contentContainerStyle={[tileStyles.screen, styles.form]}>
-      <Text style={styles.label}>New words per day</Text>
-      <TextInput
-        value={text ?? String(newPerDay)}
-        onChangeText={next => {
-          const digits = next.replace(/\D/g, '').slice(0, 4);
-          setText(digits);
-          if (digits) setNewPerDay(Number(digits));
-        }}
-        onBlur={() => setText(undefined)}
-        keyboardType="number-pad"
-        accessibilityLabel="New words per day"
-        style={styles.input}
-      />
-      <Text style={styles.note}>
-        How many unseen words spaced repetition introduces each day. Words due for review always
-        come first.
-      </Text>
       <ImportedBooks />
       <Text style={[styles.label, styles.section]}>Theme</Text>
       <View style={styles.swatches} accessibilityRole="radiogroup">
@@ -108,7 +89,7 @@ function ImportedBooks() {
     });
   return (
     <>
-      <Text style={[styles.label, styles.section]}>Imported books</Text>
+      <Text style={styles.label}>Imported books</Text>
       {imported.map(b => (
         <View key={b.id} style={styles.bookRow}>
           <Text style={styles.bookTitle} numberOfLines={1}>
@@ -161,16 +142,6 @@ const useStyles = makeStyles(theme => ({
   form: { gap: 12, maxWidth: 420 },
   label: { color: theme.text, fontSize: 15, fontWeight: '600' },
   section: { marginTop: 12 },
-  input: {
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 10,
-    backgroundColor: theme.surface,
-    borderWidth: 1,
-    borderColor: theme.border,
-    color: theme.text,
-    fontSize: 16,
-  },
   note: { color: theme.muted, fontSize: 13 },
   swatches: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   swatch: { width: 104, padding: 8, gap: 6, borderRadius: 10, borderWidth: 1 },

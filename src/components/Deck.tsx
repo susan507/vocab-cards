@@ -22,29 +22,32 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { reorderKeeping, spokenText } from '@/lib/books';
 import { resolveAudio, resolveImage } from '@/lib/offlineAudio';
-import {
-  ORDERS,
-  useDeckOrder,
-  useDirection,
-  useNewPerDay,
-  useNewToday,
-  useProgress,
-  useSavedSession,
-} from '@/lib/prefs';
+import { ORDERS, useDeckOrder, useDirection, useProgress, useSavedSession } from '@/lib/prefs';
 import type { Order } from '@/lib/prefs';
 import {
   answer,
   answerProgress,
+  answerReview,
+  chapterSessionIds,
   DIRECTIONS,
-  isFirstRound,
+  drillPile,
+  dueSessionIds,
+  nextDueIn,
+  openReview,
+  parseReview,
   parseSession,
   progressKey,
+  removeFromReview,
   removeWord,
+  reviewCurrent,
+  reviewOrder,
   setRetired,
+  shakiestIds,
+  startReview,
   startSession,
   today,
 } from '@/lib/srs';
-import type { Direction, ProgressMap, Session } from '@/lib/srs';
+import type { Direction, ProgressMap, Review, Session } from '@/lib/srs';
 import type { Link, Word } from '@/lib/types';
 import { makeStyles, useTheme } from '@/theme';
 
@@ -56,14 +59,6 @@ const MODE_ROW = 40;
 // Room for the round line, the Yes/No buttons and the retire control under a spaced-repetition card.
 const ANSWER_SPACE = 136;
 
-/** Picks a spaced-repetition session's word ids (see srs.ts); `newLeft` is today's remaining new words in `dir`. */
-export type SessionDeck = (
-  progress: ProgressMap,
-  newLeft: number,
-  day: string,
-  dir: Direction,
-) => string[];
-
 // `order` is null until the spaced-repetition session is ready (progress still loading).
 type DeckView = {
   items: Word[];
@@ -72,20 +67,28 @@ type DeckView = {
   /** The direction `session` belongs to. */
   dir: Direction;
   revealed: boolean;
+  /** A chapter's spaced-repetition session. */
   session: Session | null;
+  /** "Review all" instead of a session. */
+  review: Review | null;
+  /** The chapter had nothing due when opened. */
+  caughtUp: boolean;
 };
+
+const NO_SRS = { revealed: false, session: null, review: null, caughtUp: false };
 
 /**
  * Full-screen flashcards. Swipe left/right = next/prev, tap = replay audio.
  * `words` is in source order; the saved deck order (or a fixed `mode`) decides what's shown.
- * Spaced repetition: a session of Yes/No rounds over `sessionDeck`'s words, saved under `sessionKey`;
- * tap reveals the other side. The direction setting decides which side is the prompt.
+ * Spaced repetition: a session of Yes/No rounds over `words` (or, with `review`, the whole-book
+ * review queue), saved under `sessionKey`; tap reveals the other side. The direction setting decides
+ * which side is the prompt.
  */
 export function Deck({
   words,
   bookId,
   sessionKey,
-  sessionDeck,
+  review: isReview,
   links,
   mode,
   onClose,
@@ -93,7 +96,7 @@ export function Deck({
   words: Word[];
   bookId: string;
   sessionKey: string;
-  sessionDeck: SessionDeck;
+  review?: boolean;
   links?: Link[];
   mode?: Order;
   onClose: () => void;
@@ -105,20 +108,16 @@ export function Deck({
   // EN→ES spaced repetition: the Spanish audio would give the answer away, so it waits for the reveal.
   const autoPlay = dir === 'esEn';
   const [progress, setProgress] = useProgress(bookId);
-  const [newPerDay] = useNewPerDay();
-  const newToday = useNewToday(dir);
   const [savedSession, saveSession] = useSavedSession(sessionKey, dir);
   const byId = useMemo(() => new Map(words.map(w => [w.id, w])), [words]);
+  const reviewIds = useMemo(
+    () => (isReview && progress ? reviewOrder(words, bookId, progress, today(), dir) : []),
+    [isReview, words, bookId, progress, dir],
+  );
   const [view, setView] = useState<DeckView>(() =>
     srs
-      ? { items: [], index: 0, order: null, dir, revealed: false, session: null }
-      : {
-          order,
-          dir,
-          revealed: false,
-          session: null,
-          ...reorderKeeping(words, undefined, order === 'random'),
-        },
+      ? { items: [], index: 0, order: null, dir, ...NO_SRS }
+      : { order, dir, ...NO_SRS, ...reorderKeeping(words, undefined, order === 'random') },
   );
   // Gesture and key handlers read this so they always act on the card on screen.
   const viewRef = useRef(view);
@@ -167,8 +166,11 @@ export function Deck({
   }, [play]);
 
   const wordOf = useCallback(
-    (v: DeckView) => (v.order === 'srs' ? byId.get(v.session?.queue[0] ?? '') : v.items[v.index]),
-    [byId],
+    (v: DeckView) =>
+      v.order !== 'srs'
+        ? v.items[v.index]
+        : byId.get((v.review ? reviewCurrent(v.review, reviewIds) : v.session?.queue[0]) ?? ''),
+    [byId, reviewIds],
   );
 
   // The saved order and direction can change from the toggles or finish loading after mount.
@@ -179,21 +181,27 @@ export function Deck({
       show({
         order,
         dir,
-        revealed: false,
-        session: null,
+        ...NO_SRS,
         ...reorderKeeping(words, wordOf(current), order === 'random'),
       });
       return;
     }
-    if (progress === undefined || newToday.count === undefined || savedSession === undefined)
-      return;
+    if (progress === undefined || savedSession === undefined) return;
     const day = today();
-    const session =
-      parseSession(savedSession, day) ??
-      startSession(sessionDeck(progress, Math.max(0, newPerDay - newToday.count), day, dir), day);
-    saveSession(session.queue.length ? session : null);
-    show({ ...current, order, dir, session, revealed: false });
-    if (autoPlay) play(byId.get(session.queue[0] ?? ''));
+    let next: DeckView;
+    if (isReview) {
+      const review = openReview(parseReview(savedSession, day) ?? startReview(day), reviewIds);
+      saveSession(review);
+      next = { ...current, order, dir, ...NO_SRS, review };
+    } else {
+      const saved = parseSession(savedSession, day);
+      const ids = saved ? [] : dueSessionIds(words, bookId, progress, day, dir);
+      const session = saved ?? startSession(ids, day);
+      saveSession(session.queue.length ? session : null);
+      next = { ...current, order, dir, ...NO_SRS, session, caughtUp: !saved && !ids.length };
+    }
+    show(next);
+    if (autoPlay) play(wordOf(next));
   }, [
     order,
     dir,
@@ -203,12 +211,11 @@ export function Deck({
     play,
     wordOf,
     progress,
-    newToday.count,
-    newPerDay,
     savedSession,
     saveSession,
-    sessionDeck,
-    byId,
+    isReview,
+    reviewIds,
+    bookId,
   ]);
 
   // Spaced repetition: every action below runs from a press or key handler, so audio may start.
@@ -218,35 +225,41 @@ export function Deck({
     play(wordOf(current));
   }, [play, show, wordOf]);
 
-  const moveOn = (session: Session) => {
-    // A finished session isn't kept: the next one starts afresh.
-    saveSession(session.queue.length ? session : null);
-    show({ ...viewRef.current, session, revealed: false });
-    if (autoPlay) play(byId.get(session.queue[0] ?? ''));
+  const moveOn = (change: Partial<Pick<DeckView, 'session' | 'review'>>) => {
+    const next = { ...viewRef.current, ...change, revealed: false, caughtUp: false };
+    // A finished chapter session isn't kept: the next one starts afresh.
+    saveSession(next.review ?? (next.session?.queue.length ? next.session : null));
+    show(next);
+    if (autoPlay) play(wordOf(next));
   };
 
   const onAnswer = (yes: boolean) => {
     const current = viewRef.current;
-    const { session, revealed } = current;
+    const { session, review, revealed } = current;
     const word = wordOf(current);
-    if (!session || !word || !revealed || !progress || current.dir !== dir) return;
-    if (isFirstRound(session)) {
-      const key = progressKey(bookId, word, dir);
-      const prev = progress[key];
-      setProgress(key, answerProgress(prev, yes, session.day, new Date()));
-      if (!prev?.box) newToday.increment();
-    }
-    moveOn(answer(session, yes));
+    if (!word || !revealed || !progress || current.dir !== dir) return;
+    const key = progressKey(bookId, word, dir);
+    const prev = progress[key];
+    const next = answerProgress(prev, yes, (review ?? session)?.day ?? today(), new Date());
+    if (next !== prev) setProgress(key, next);
+    if (review) moveOn({ review: answerReview(review, yes, reviewIds) });
+    else if (session) moveOn({ session: answer(session, yes) });
   };
 
   const retire = () => {
     const current = viewRef.current;
+    const { session, review } = current;
     const word = wordOf(current);
-    if (!current.session || !word || !progress || current.dir !== dir) return;
+    if (!word || !progress || current.dir !== dir) return;
     const key = progressKey(bookId, word, dir);
     setProgress(key, setRetired(progress[key], true, new Date()));
-    moveOn(removeWord(current.session, word.id));
+    if (review) moveOn({ review: removeFromReview(review, word.id, reviewIds) });
+    else if (session) moveOn({ session: removeWord(session, word.id) });
   };
+
+  /** From the caught-up screen: a session over another chapter deck. */
+  const startAnyway = (ids: string[]) =>
+    moveOn({ session: startSession(ids, today()), review: null });
 
   const onAnswerKey = useEffectEvent(onAnswer);
 
@@ -288,7 +301,8 @@ export function Deck({
   });
   const gesture = useExclusiveGestures(swipe, tap);
 
-  const { items, index, revealed, session } = view;
+  const { items, index, revealed, session, review, caughtUp } = view;
+  const rounds = review ? review.drill : session;
   const word = wordOf(view);
   const srsReady = srs && view.order === 'srs';
   if (!word && !srsReady) return <View style={styles.root} />;
@@ -350,8 +364,21 @@ export function Deck({
             { paddingTop: topSpace, paddingBottom: insets.bottom + CHROME_SPACE },
           ]}
         >
-          <Text style={styles.doneTitle}>That’s all for now</Text>
-          <Text style={styles.en}>Come back later for more.</Text>
+          {caughtUp || review ? (
+            <CaughtUp
+              words={words}
+              bookId={bookId}
+              progress={progress ?? {}}
+              dir={dir}
+              review={!!review}
+              onStart={startAnyway}
+            />
+          ) : (
+            <>
+              <Text style={styles.doneTitle}>That’s all for now</Text>
+              <Text style={styles.en}>Come back later for more.</Text>
+            </>
+          )}
         </View>
       ) : (
         <GestureDetector gesture={gesture}>
@@ -415,11 +442,28 @@ export function Deck({
           >
             <Ionicons name="checkmark" size={20} color={theme.muted} />
           </Pressable>
-          {session ? (
-            <Text style={[styles.status, { bottom: insets.bottom + 84 }]}>
-              {session.stage === 'revise' ? 'Revise · round ' : 'Round '}
-              {session.round} · {session.queue.length} to go · Yes {session.yes.length} · No{' '}
-              {session.no.length}
+          {review && !review.drill ? (
+            review.pile.length ? (
+              <Pressable
+                onPress={() => moveOn({ review: drillPile(review) })}
+                hitSlop={8}
+                accessibilityRole="button"
+                style={[styles.status, { bottom: insets.bottom + 84 }]}
+              >
+                <Text style={[styles.statusText, styles.drill]}>
+                  Drill No pile ({review.pile.length})
+                </Text>
+              </Pressable>
+            ) : null
+          ) : rounds ? (
+            <Text style={[styles.status, styles.statusText, { bottom: insets.bottom + 84 }]}>
+              {review
+                ? 'No pile · round '
+                : rounds.stage === 'revise'
+                  ? 'Revise · round '
+                  : 'Round '}
+              {rounds.round} · {rounds.queue.length} to go · Yes {rounds.yes.length} · No{' '}
+              {rounds.no.length}
             </Text>
           ) : null}
           {revealed ? (
@@ -568,6 +612,61 @@ export function Deck({
   );
 }
 
+/** Nothing due: when to come back, and (in a chapter) sessions to run anyway. */
+function CaughtUp({
+  words,
+  bookId,
+  progress,
+  dir,
+  review,
+  onStart,
+}: {
+  words: Word[];
+  bookId: string;
+  progress: ProgressMap;
+  dir: Direction;
+  review: boolean;
+  onStart: (ids: string[]) => void;
+}) {
+  const styles = useStyles();
+  const day = today();
+  const wait = nextDueIn(words, bookId, progress, day, dir);
+  const options = review
+    ? []
+    : ([
+        ['Practise the shakiest anyway', shakiestIds(words, bookId, progress, day, dir)],
+        ['Run the whole chapter again', chapterSessionIds(words, bookId, progress, dir)],
+      ] as const);
+  return (
+    <>
+      <Text style={styles.doneTitle}>All caught up</Text>
+      <Text style={styles.en}>
+        {wait === undefined
+          ? review
+            ? 'This reviews the words you’ve studied. Start with a chapter.'
+            : 'Nothing to review here.'
+          : review
+            ? 'Every word you’ve studied has had a turn today. Come back tomorrow.'
+            : `Next review ${wait <= 1 ? 'tomorrow' : `in ${wait} days`}.`}
+      </Text>
+      <View style={styles.catchUp}>
+        {options.map(([label, ids]) =>
+          ids.length ? (
+            <Pressable
+              key={label}
+              onPress={() => onStart([...ids])}
+              accessibilityRole="button"
+              style={({ pressed }) => [styles.catchUpButton, pressed && styles.pressed]}
+            >
+              <Text style={styles.answerText}>{label}</Text>
+            </Pressable>
+          ) : null,
+        )}
+      </View>
+    </>
+  );
+}
+
 const useStyles = makeStyles(theme => ({
   root: { flex: 1, backgroundColor: theme.bg },
   card: {
@@ -625,13 +724,20 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  status: {
-    position: 'absolute',
-    left: 60,
-    right: 60,
-    color: theme.muted,
-    fontSize: 13,
-    textAlign: 'center',
+  status: { position: 'absolute', left: 60, right: 60, alignItems: 'center' },
+  statusText: { color: theme.muted, fontSize: 13, textAlign: 'center' },
+  drill: { color: theme.accent, fontWeight: '600' },
+  catchUp: { gap: 12, alignItems: 'center', marginTop: 12 },
+  catchUpButton: {
+    minHeight: 48,
+    minWidth: 260,
+    borderRadius: 10,
+    backgroundColor: theme.surface,
+    borderWidth: 1,
+    borderColor: theme.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
   },
   answers: {
     position: 'absolute',

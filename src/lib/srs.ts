@@ -8,9 +8,9 @@ import type { Word } from './types';
 
 /** One word's progress. `updatedAt` (ISO) decides which copy wins when syncing. */
 export type Progress = {
-  /** 1..MAX_BOX; absent until the word's first round-1 answer. */
+  /** 1..MAX_BOX; absent until the word's first answer. */
   box?: number;
-  /** Day of the last round-1 answer. */
+  /** Day of the last answer that moved the box (the first of that day). */
   last?: string;
   retired?: boolean;
   updatedAt: string;
@@ -68,21 +68,33 @@ export function parseProgress(raw: string | null | undefined): ProgressMap {
 const studied = (p: Progress | undefined): p is Progress & { box: number; last: string } =>
   !!p?.box && !!p.last;
 
-export const isDue = (p: Progress | undefined, day: string) =>
-  studied(p) && daysBetween(p.last, day) >= intervalDays(p.box);
+/** Calendar days since the last answer ÷ the box interval; 1 or more is due. */
+const overdue = (p: Progress & { box: number; last: string }, day: string) =>
+  daysBetween(p.last, day) / intervalDays(p.box);
 
-/** A round-1 answer: Yes moves the word up a box (an unseen word counts as box 1), No sends it to box 1. */
-export const answerProgress = (
+export const isDue = (p: Progress | undefined, day: string) => studied(p) && overdue(p, day) >= 1;
+
+/**
+ * Only a word's first answer of the day moves its box: No to box 1, Yes up one box, or further
+ * when it was remembered after a longer gap (to the largest box whose interval fits the gap).
+ * A never-seen word goes to box 2 on Yes. Later answers that day return `prev` unchanged.
+ */
+export function answerProgress(
   prev: Progress | undefined,
   yes: boolean,
   day: string,
   now: Date,
-): Progress => ({
-  ...prev,
-  box: yes ? Math.min(MAX_BOX, (prev?.box ?? 1) + 1) : 1,
-  last: day,
-  updatedAt: now.toISOString(),
-});
+): Progress {
+  if (prev && studied(prev) && prev.last === day) return prev;
+  const gap = studied(prev) ? daysBetween(prev.last, day) : 0;
+  const credit = gap >= 1 ? Math.floor(Math.log2(gap)) + 1 : 0;
+  return {
+    ...prev,
+    box: yes ? Math.min(MAX_BOX, Math.max((prev?.box ?? 1) + 1, credit)) : 1,
+    last: day,
+    updatedAt: now.toISOString(),
+  };
+}
 
 export const setRetired = (prev: Progress | undefined, retired: boolean, now: Date): Progress => ({
   ...prev,
@@ -98,28 +110,80 @@ export const chapterSessionIds = (
   dir: Direction,
 ) => words.filter(w => !progress[progressKey(bookId, w, dir)]?.retired).map(w => w.id);
 
-/** "Review all": due words and up to `newLimit` never-answered words, in book order. */
-export function reviewSessionIds(
+type Seen = { id: string; box: number; days: number; score: number };
+
+/** Studied, non-retired words, most overdue first; ties longest since the last answer, then book order. */
+function seenByOverdue(
   words: readonly Word[],
   bookId: string,
   progress: ProgressMap,
-  newLimit: number,
+  day: string,
+  dir: Direction,
+): Seen[] {
+  const seen: Seen[] = [];
+  for (const word of words) {
+    const p = progress[progressKey(bookId, word, dir)];
+    if (!studied(p) || p.retired) continue;
+    seen.push({ id: word.id, box: p.box, days: daysBetween(p.last, day), score: overdue(p, day) });
+  }
+  return seen.sort((a, b) => b.score - a.score || b.days - a.days);
+}
+
+/** The next chapter session: due and box-1 words, most overdue first, then never-seen words in book order. */
+export function dueSessionIds(
+  words: readonly Word[],
+  bookId: string,
+  progress: ProgressMap,
   day: string,
   dir: Direction,
 ): string[] {
-  const ids: string[] = [];
-  let fresh = 0;
-  for (const word of words) {
-    const p = progress[progressKey(bookId, word, dir)];
-    if (p?.retired) continue;
-    if (isDue(p, day)) ids.push(word.id);
-    else if (!studied(p) && fresh < newLimit) {
-      ids.push(word.id);
-      fresh++;
-    }
-  }
-  return ids;
+  const due = seenByOverdue(words, bookId, progress, day, dir).filter(
+    s => s.score >= 1 || s.box === 1,
+  );
+  const unseen = words.filter(w => {
+    const p = progress[progressKey(bookId, w, dir)];
+    return !studied(p) && !p?.retired;
+  });
+  return [...due.map(s => s.id), ...unseen.map(w => w.id)];
 }
+
+export const SHAKIEST = 20;
+
+/** "Practise the shakiest anyway": the studied words in the lowest boxes, most overdue first. */
+export const shakiestIds = (
+  words: readonly Word[],
+  bookId: string,
+  progress: ProgressMap,
+  day: string,
+  dir: Direction,
+) =>
+  seenByOverdue(words, bookId, progress, day, dir)
+    .sort((a, b) => a.box - b.box)
+    .slice(0, SHAKIEST)
+    .map(s => s.id);
+
+/** Days until the next studied word is due (0 if one already is); undefined when none are studied. */
+export function nextDueIn(
+  words: readonly Word[],
+  bookId: string,
+  progress: ProgressMap,
+  day: string,
+  dir: Direction,
+): number | undefined {
+  const waits = seenByOverdue(words, bookId, progress, day, dir).map(s =>
+    Math.max(0, intervalDays(s.box) - s.days),
+  );
+  return waits.length ? Math.min(...waits) : undefined;
+}
+
+/** "Review all" order: every studied, non-retired word in the book, most overdue first. */
+export const reviewOrder = (
+  words: readonly Word[],
+  bookId: string,
+  progress: ProgressMap,
+  day: string,
+  dir: Direction,
+) => seenByOverdue(words, bookId, progress, day, dir).map(s => s.id);
 
 /** How fresh the studied, non-retired words are (1 just answered, 0 due); undefined when none are studied. */
 export function strength(
@@ -134,7 +198,7 @@ export function strength(
   for (const word of words) {
     const p = progress[progressKey(bookId, word, dir)];
     if (!studied(p) || p.retired) continue;
-    sum += Math.max(0, 1 - daysBetween(p.last, day) / intervalDays(p.box));
+    sum += Math.max(0, 1 - overdue(p, day));
     n++;
   }
   return n ? sum / n : undefined;
@@ -160,9 +224,6 @@ type Mix = (ids: readonly string[]) => string[];
 export const startSession = (ids: readonly string[], day: string, mix: Mix = shuffle): Session =>
   nextRound({ day, stage: 'main', round: 0, queue: [], yes: [], no: [...ids], missed: [] }, mix);
 
-/** Only round 1 of the main stage moves Leitner boxes. */
-export const isFirstRound = (s: Session) => s.stage === 'main' && s.round === 1;
-
 function nextRound(s: Session, mix: Mix): Session {
   if (s.queue.length) return s;
   if (s.no.length) return { ...s, round: s.round + 1, queue: mix(s.no), yes: [], no: [] };
@@ -180,7 +241,7 @@ export function answer(s: Session, yes: boolean, mix: Mix = shuffle): Session {
       queue,
       yes: yes ? [...s.yes, id] : s.yes,
       no: yes ? s.no : [...s.no, id],
-      missed: !yes && isFirstRound(s) ? [...s.missed, id] : s.missed,
+      missed: !yes && s.stage === 'main' && s.round === 1 ? [...s.missed, id] : s.missed,
     },
     mix,
   );
@@ -210,6 +271,96 @@ export function parseSession(raw: string | null | undefined, day: string): Sessi
     )
       return null;
     return s;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * "Review all": one ongoing queue over `reviewOrder`, minus the words already answered from it
+ * today (`done`) and the No pile. When the pile reaches DRILL_AT (or on demand, or when the queue
+ * runs out) it's drilled: rounds of just those words until each gets a Yes, then back to the queue.
+ */
+export type Review = { day: string; done: string[]; pile: string[]; drill: Session | null };
+
+export const DRILL_AT = 10;
+
+export const startReview = (day: string): Review => ({ day, done: [], pile: [], drill: null });
+
+/** The word on screen, or undefined when the queue has run out. */
+export function reviewCurrent(r: Review, order: readonly string[]) {
+  if (r.drill) return r.drill.queue[0];
+  const skip = new Set([...r.done, ...r.pile]);
+  return order.find(id => !skip.has(id));
+}
+
+/** Rounds of the No pile, starting straight at the revision stage so it ends once each word has a Yes. */
+export const drillPile = (r: Review, mix: Mix = shuffle): Review => ({
+  ...r,
+  done: [...r.done, ...r.pile],
+  pile: [],
+  drill: nextRound(
+    { day: r.day, stage: 'revise', round: 0, queue: [], yes: [], no: [...r.pile], missed: [] },
+    mix,
+  ),
+});
+
+/** Ends a finished drill and drills the pile once the queue has run out. */
+function settle(r: Review, order: readonly string[], mix: Mix): Review {
+  if (r.drill && !r.drill.queue.length) r = { ...r, drill: null };
+  if (!r.drill && r.pile.length && reviewCurrent(r, order) === undefined) return drillPile(r, mix);
+  return r;
+}
+
+export const openReview = (r: Review, order: readonly string[], mix: Mix = shuffle) =>
+  settle(r, order, mix);
+
+export function answerReview(
+  r: Review,
+  yes: boolean,
+  order: readonly string[],
+  mix: Mix = shuffle,
+): Review {
+  const id = reviewCurrent(r, order);
+  if (id === undefined) return r;
+  if (r.drill) return settle({ ...r, drill: answer(r.drill, yes, mix) }, order, mix);
+  const next = yes ? { ...r, done: [...r.done, id] } : { ...r, pile: [...r.pile, id] };
+  return next.pile.length >= DRILL_AT ? drillPile(next, mix) : settle(next, order, mix);
+}
+
+/** Takes a retired word out of the review wherever it is. */
+export const removeFromReview = (
+  r: Review,
+  id: string,
+  order: readonly string[],
+  mix: Mix = shuffle,
+): Review =>
+  settle(
+    {
+      ...r,
+      done: [...r.done, id],
+      pile: r.pile.filter(i => i !== id),
+      drill: r.drill && removeWord(r.drill, id, mix),
+    },
+    order,
+    mix,
+  );
+
+/** A saved review, only if it's from `day`. An older saved "Review all" session finishes as a drill. */
+export function parseReview(raw: string | null | undefined, day: string): Review | null {
+  const legacy = parseSession(raw, day);
+  if (legacy)
+    return {
+      day,
+      done: [...legacy.queue, ...legacy.yes, ...legacy.no, ...legacy.missed],
+      pile: [],
+      drill: legacy,
+    };
+  try {
+    const r = JSON.parse(raw ?? 'null') as Review | null;
+    const drill = r?.drill ? parseSession(JSON.stringify(r.drill), day) : null;
+    if (r?.day !== day || !isIds(r.done) || !isIds(r.pile) || (r.drill && !drill)) return null;
+    return { day, done: r.done, pile: r.pile, drill };
   } catch {
     return null;
   }
