@@ -105,7 +105,7 @@ Write `scripts/import/<source>.ts` that outputs a `Book` to `src/data/books/<id>
 
 ## Profiles backend
 
-Profiles are a name and PIN, not real security. The app signs in with Supabase Auth using `<name>@vocab-cards.local` and a password derived from the PIN. `supabase/migrations/` creates `profiles` (filled by a trigger on sign-up), `topic_marks`, `word_progress` and `private_books` (imported book files, one JSON per user and book). Row level security lets each signed-in user touch only their own rows, and `anon` gets no table access.
+Profiles are a name and PIN, not real security. The app signs in with Supabase Auth using `<name>@vocab-cards.local` and a password derived from the PIN. `supabase/migrations/` creates `profiles` (filled by a trigger on sign-up), `topic_marks`, `word_progress`, `private_books` (imported book files, one JSON per user and book) and `study_sessions` (in-progress sessions per deck and direction; a finished one stays as a tombstone so it beats older copies). Row level security lets each signed-in user touch only their own rows, and `anon` gets no table access.
 
 - **Apply:** the Supabase GitHub integration runs new migrations when they merge to `main`. To apply by hand, paste the migration into the SQL editor or run `psql "<connection string>" -f supabase/migrations/<file>.sql`.
 - **Dashboard step:** in Authentication → Providers → Email, turn off "Confirm email".

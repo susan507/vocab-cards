@@ -12,13 +12,17 @@ import {
   forDirection,
   isDue,
   isUntouched,
+  newestSaved,
   nextDueIn,
   openReview,
   parseReview,
+  parseSaved,
   parseSession,
   progressKey,
   removeFromReview,
   removeWord,
+  sameSaved,
+  SESSION_VERSION,
   reviewCurrent,
   reviewOrder,
   setRetired,
@@ -26,8 +30,9 @@ import {
   startReview,
   startSession,
   strength,
+  toSaved,
 } from '../src/lib/srs.ts';
-import type { Progress, ProgressMap, Review, Session } from '../src/lib/srs.ts';
+import type { Progress, ProgressMap, Review, Saved, Session } from '../src/lib/srs.ts';
 import type { Word } from '../src/lib/types.ts';
 
 const words: Word[] = Array.from({ length: 6 }, (_, i) => ({
@@ -38,6 +43,7 @@ const words: Word[] = Array.from({ length: 6 }, (_, i) => ({
 const key = (i: number) => `b:${i}`;
 const now = new Date('2026-01-01T12:00:00Z');
 const keep = (ids: readonly string[]) => [...ids];
+const stored = (data: Session | Review | null, at = now) => JSON.stringify(toSaved(data, at));
 const reverse = (ids: readonly string[]) => [...ids].reverse();
 
 /** Answers the session's words in queue order; `yes` decides per word id. */
@@ -263,24 +269,23 @@ test('book review: retiring takes a word out of the queue, pile and drill', () =
   assert.deepEqual(r.drill?.queue, ['w2']);
 });
 
-test('book review state resumes the same day; an old saved session finishes as a drill', () => {
+test('book review state resumes the same day and current version only', () => {
   const r: Review = {
     day: '2026-01-01',
     done: ['a'],
     pile: ['b'],
     drill: startSession(['c'], '2026-01-01', keep),
   };
-  assert.deepEqual(parseReview(JSON.stringify(r), '2026-01-01'), r);
-  assert.equal(parseReview(JSON.stringify(r), '2026-01-02'), null);
-  assert.equal(parseReview('{"day":"2026-01-01","done":[]}', '2026-01-01'), null);
-  assert.equal(parseReview('null', '2026-01-01'), null);
-  const legacy = startSession(['x', 'y'], '2026-01-01', keep);
-  assert.deepEqual(parseReview(JSON.stringify(legacy), '2026-01-01'), {
-    day: '2026-01-01',
-    done: ['x', 'y'],
-    pile: [],
-    drill: legacy,
-  });
+  assert.deepEqual(parseReview(stored(r), '2026-01-01'), r);
+  assert.equal(parseReview(stored(r), '2026-01-02'), null);
+  assert.equal(parseReview(JSON.stringify(r), '2026-01-01'), null);
+  assert.equal(parseReview(stored({ day: '2026-01-01', done: [] } as never), '2026-01-01'), null);
+  assert.equal(parseReview(stored(null), '2026-01-01'), null);
+  // A plain session saved by an older version as "Review all" is rebuilt, not resumed.
+  assert.equal(
+    parseReview(JSON.stringify(startSession(['x'], '2026-01-01', keep)), '2026-01-01'),
+    null,
+  );
 });
 
 test('book review reaches every word over days of partial reviews (no starvation)', () => {
@@ -326,12 +331,56 @@ test('strength: nothing until studied, full when fresh, shrinking to 0 when due;
   assert.equal(strength(words, 'b', progress, '2026-02-01', 'esEn'), 0);
 });
 
-test('a saved session resumes only on the same day', () => {
+test('a saved session resumes only on the same day and current version', () => {
   const s = startSession(['a'], '2026-01-01', keep);
-  assert.deepEqual(parseSession(JSON.stringify(s), '2026-01-01'), s);
-  assert.equal(parseSession(JSON.stringify(s), '2026-01-02'), null);
+  assert.deepEqual(parseSession(stored(s), '2026-01-01'), s);
+  assert.equal(parseSession(stored(s), '2026-01-02'), null);
+  assert.equal(parseSession(stored(null), '2026-01-01'), null);
   assert.equal(parseSession('null', '2026-01-01'), null);
-  assert.equal(parseSession('{"day":"2026-01-01"}', '2026-01-01'), null);
+  assert.equal(parseSession(stored({ day: '2026-01-01' } as never), '2026-01-01'), null);
+  // Saved without a version (older app) or with another one: treated as absent.
+  assert.equal(parseSession(JSON.stringify(s), '2026-01-01'), null);
+  const other = JSON.stringify({ ...toSaved(s, now), version: SESSION_VERSION + 1 });
+  assert.equal(parseSession(other, '2026-01-01'), null);
+  assert.equal(parseSaved(other), null);
+});
+
+test('syncing sessions: newest wins, tombstones included; missing or outdated copies lose', () => {
+  const day = '2026-01-01';
+  const at = (h: number) => new Date(`${day}T${String(h).padStart(2, '0')}:00:00Z`);
+  const phone = toSaved(answer(startSession(['a', 'b', 'c'], day, keep), true, keep), at(9));
+  const finished = toSaved(null, at(11));
+  // Started on the phone, finished on the laptop: the laptop's tombstone beats the phone's session.
+  assert.equal(newestSaved(phone, finished), finished);
+  assert.equal(parseSession(JSON.stringify(newestSaved(phone, finished)), day), null);
+  // A newer in-progress copy beats an older tombstone, from either side.
+  const later = toSaved(answer(phone.data as Session, false, keep), at(12));
+  assert.equal(newestSaved(finished, later), later);
+  assert.equal(newestSaved(later, finished), later);
+  // Ties keep the local copy; nothing remote keeps local; nothing local takes remote.
+  assert.equal(newestSaved(phone, { ...phone }), phone);
+  assert.equal(newestSaved(phone, null), phone);
+  assert.equal(newestSaved(null, phone), phone);
+  assert.equal(newestSaved(null, null), null);
+  // An old-version copy (the stale 275-word session) reads as absent, so any current copy wins.
+  const stale = parseSaved(JSON.stringify(phone.data));
+  assert.equal(stale, null);
+  assert.equal(newestSaved(stale, finished), finished);
+  // Postgres-style timestamps compare by instant.
+  const remote = parseSaved(JSON.stringify({ ...finished, updatedAt: '2026-01-01 13:00:00+02' }));
+  assert.equal(remote?.updatedAt, '2026-01-01T11:00:00.000Z');
+  // The newest copy from yesterday is still not resumed today.
+  const yesterday: Saved = toSaved(startSession(['a'], '2025-12-31', keep), at(12));
+  assert.equal(parseSession(JSON.stringify(newestSaved(phone, yesterday)), day), null);
+});
+
+test('saving an unchanged session is a no-op, so it does not look newer', () => {
+  const s = startSession(['a'], '2026-01-01', keep);
+  assert.equal(sameSaved(toSaved(s, now), { ...s }), true);
+  assert.equal(sameSaved(toSaved(s, now), answer(s, true, keep)), false);
+  assert.equal(sameSaved(null, null), true);
+  assert.equal(sameSaved(toSaved(null, now), null), true);
+  assert.equal(sameSaved(toSaved(s, now), null), false);
 });
 
 test('directions are separate decks; legacy keys read as ES→EN', () => {

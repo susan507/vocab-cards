@@ -263,21 +263,60 @@ export function removeWord(s: Session, id: string, mix: Mix = shuffle): Session 
 const isIds = (v: unknown): v is string[] =>
   Array.isArray(v) && v.every(i => typeof i === 'string');
 
-/** A saved session, only if it's from `day`. */
-export function parseSession(raw: string | null | undefined, day: string): Session | null {
+const isSession = (s: Session | null | undefined, day: string): s is Session =>
+  s?.day === day &&
+  (s.stage === 'main' || s.stage === 'revise') &&
+  typeof s.round === 'number' &&
+  [s.queue, s.yes, s.no, s.missed].every(isIds);
+
+/**
+ * How a session or review state is stored (on the device and in `study_sessions.data`). `data: null`
+ * is a tombstone: the session was finished or dropped at `updatedAt`, so it beats older copies elsewhere.
+ * Bump SESSION_VERSION when the session rules change: older saves then read as absent and are rebuilt.
+ */
+export type Saved = { version: number; updatedAt: string; data: Session | Review | null };
+
+export const SESSION_VERSION = 1;
+
+export const toSaved = (data: Session | Review | null, now: Date): Saved => ({
+  version: SESSION_VERSION,
+  updatedAt: now.toISOString(),
+  data,
+});
+
+/** A stored session of the current version, or null for anything else (absent, older version, corrupt). */
+export function asSaved(value: unknown): Saved | null {
+  const s = value as Saved | null;
+  if (
+    s?.version !== SESSION_VERSION ||
+    typeof s.updatedAt !== 'string' ||
+    Number.isNaN(Date.parse(s.updatedAt)) ||
+    typeof s.data !== 'object'
+  )
+    return null;
+  return { version: s.version, updatedAt: new Date(s.updatedAt).toISOString(), data: s.data };
+}
+
+export function parseSaved(raw: string | null | undefined): Saved | null {
   try {
-    const s = JSON.parse(raw ?? 'null') as Session | null;
-    if (
-      s?.day !== day ||
-      (s.stage !== 'main' && s.stage !== 'revise') ||
-      typeof s.round !== 'number' ||
-      ![s.queue, s.yes, s.no, s.missed].every(isIds)
-    )
-      return null;
-    return s;
+    return asSaved(JSON.parse(raw ?? 'null'));
   } catch {
     return null;
   }
+}
+
+/** The copy to keep when syncing: newest `updatedAt` wins (tombstones included); ties keep `local`. */
+export const newestSaved = (local: Saved | null, remote: Saved | null) =>
+  !remote || (local && local.updatedAt >= remote.updatedAt) ? local : remote;
+
+/** True when saving `data` over `prev` would change nothing, so the timestamp isn't bumped needlessly. */
+export const sameSaved = (prev: Saved | null, data: Session | Review | null) =>
+  JSON.stringify(prev?.data ?? null) === JSON.stringify(data);
+
+/** A saved chapter session, only if it's from `day` and the current version. */
+export function parseSession(raw: string | null | undefined, day: string): Session | null {
+  const data = parseSaved(raw)?.data as Session | null | undefined;
+  return isSession(data, day) ? data : null;
 }
 
 /**
@@ -350,22 +389,10 @@ export const removeFromReview = (
     mix,
   );
 
-/** A saved review, only if it's from `day`. An older saved "Review all" session finishes as a drill. */
+/** A saved review, only if it's from `day` and the current version. */
 export function parseReview(raw: string | null | undefined, day: string): Review | null {
-  const legacy = parseSession(raw, day);
-  if (legacy)
-    return {
-      day,
-      done: [...legacy.queue, ...legacy.yes, ...legacy.no, ...legacy.missed],
-      pile: [],
-      drill: legacy,
-    };
-  try {
-    const r = JSON.parse(raw ?? 'null') as Review | null;
-    const drill = r?.drill ? parseSession(JSON.stringify(r.drill), day) : null;
-    if (r?.day !== day || !isIds(r.done) || !isIds(r.pile) || (r.drill && !drill)) return null;
-    return { day, done: r.done, pile: r.pile, drill };
-  } catch {
+  const r = parseSaved(raw)?.data as Review | null | undefined;
+  if (r?.day !== day || !isIds(r.done) || !isIds(r.pile) || (r.drill && !isSession(r.drill, day)))
     return null;
-  }
+  return { day, done: r.done, pile: r.pile, drill: r.drill ?? null };
 }
